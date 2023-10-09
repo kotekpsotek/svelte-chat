@@ -37,5 +37,10 @@
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"carbon-icons-svelte": "^12.3.0",
+		"socket.io": "^4.7.2",
+		"socket.io-client": "^4.7.2"
+	}
 }

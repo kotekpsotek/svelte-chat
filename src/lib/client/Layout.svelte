@@ -1,8 +1,8 @@
 <script lang="ts">
     import { Chat, ChatLaunch, Return } from "carbon-icons-svelte";
-    // import { io , type Socket} from "socket.io-client";
+    import { io , type Socket} from "socket.io-client";
     import { onMount } from "svelte";
-    import connection from "./connection";
+    import connection from "./connection.js";
 
     let chatStateShow = true;
     let conversationShowState = false;
@@ -47,12 +47,29 @@
     }
 
     onMount(() => {
-        // $connection = io("http://localhost:10501");
+        $connection = io("http://localhost:10501");
+        const getId = (() => {
+            let uId = localStorage.getItem("weeeeee-chatttt-id");
+
+            if (!uId) {
+                // Id doesn't exists
+                $connection!.emit("generate-my-id", (id: string) => {
+                    myId = id;
+                    localStorage.setItem("weeeeee-chatttt-id", id);
+                });
+            } 
+            else {
+                // Id does exists
+                myId = uId;
+            }
+
+            return uId;
+        })();
     })
 </script>
 
 <button class="chat-action" id="c-ico" on:click={loadChat}>
-    <Chat size={32}/>
+    <Chat size={32} fill="white"/>
 </button>
 {#if chatStateShow}
     <!-- TODO: 1. List of stated prior chats by date, 2. Chat messages, 3. Ability to send new message -->
@@ -95,6 +112,10 @@
 {/if}
 
 <style>
+    * {
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
     .chat-action {
         position: absolute;
         bottom: 15px;
@@ -106,6 +127,7 @@
 
     section.chat {
         height: 100%;
+        width: 100%;
         position: absolute;
         top: 0px;
         left: 0px;
@@ -118,8 +140,8 @@
         height: 55px;
         display: flex;
         align-items: center;
-        padding-left: 5px;
-        padding-right: 5px;
+        /* padding-left: 5px; */
+        /* padding-right: 5px; */
         color: white;
         background-color: rgb(24, 24, 24);
     }
@@ -151,7 +173,7 @@
         color: black;
         width: 100%;
         height: calc(100% - 55px);
-        padding: 5px;
+        /* padding: 5px; */
     }
 
     main.chats-list .entity {
@@ -168,7 +190,7 @@
     main.messages {
         width: 100%;
         height: calc(100% - 55px);
-        padding: 5px;
+        /* padding: 5px; */
         display: flex;
         flex-direction: column;
         row-gap: 1px;
