@@ -1,0 +1,204 @@
+<script lang="ts">
+    import { Chat, ChatLaunch, Return } from "carbon-icons-svelte";
+    // import { io , type Socket} from "socket.io-client";
+    import { onMount } from "svelte";
+    import connection from "./connection";
+
+    let chatStateShow = true;
+    let conversationShowState = false;
+
+    let newMessageContent: string = "";
+
+    function loadChat() {
+        chatStateShow = !chatStateShow;
+    }
+
+    let myId = "1"
+    let chat = {
+        title: "",
+        messages: [
+            {
+                from: "1",
+                content: "Message 1",
+                date: Date.now()
+            },
+            {
+                from: "2",
+                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
+                date: Date.now()
+            },
+        ]
+    }
+    function showOrHideChatMessages() {
+        conversationShowState = !conversationShowState;
+    }
+
+    function sendNewMessage() {
+
+    }
+
+    function spawnChatList(node: HTMLElement) {
+        const chatIcon = document.getElementById("c-ico");
+        const cIW = chatIcon!.clientWidth;
+
+        node.style.width = document.body.clientWidth - (cIW + 15) + "px";
+        
+        return {};
+    }
+
+    onMount(() => {
+        // $connection = io("http://localhost:10501");
+    })
+</script>
+
+<button class="chat-action" id="c-ico" on:click={loadChat}>
+    <Chat size={32}/>
+</button>
+{#if chatStateShow}
+    <!-- TODO: 1. List of stated prior chats by date, 2. Chat messages, 3. Ability to send new message -->
+    <section class="chat" use:spawnChatList>
+        {#if !conversationShowState}
+            <div class="upper">
+                <h1>Chats list</h1>
+            </div>
+            <main class="chats-list">
+                <!-- Chats list -->
+                <button class="entity" on:click={showOrHideChatMessages}>
+                    <ChatLaunch/>
+                    <p class="n">Chat new name</p>
+                </button>
+            </main>
+        {:else}
+            <div class="upper">
+                <button class="go-back" on:click={showOrHideChatMessages}>
+                    <Return size={24}/>
+                </button>
+                <h1>Chat conversation ({chat.title.length ? chat.title : "No Name"})</h1>
+            </div>
+            <main class="messages">
+                {#each chat.messages as message}
+                    <div class="c" class:my={message.from == myId}>
+                        <div>
+                            <p>{message.content}</p>
+                        </div>
+                    </div>
+                {/each}
+            </main>
+        {/if}
+       <!--  <div class="msg">
+            <input type="text" bind:value={newMessageContent}>
+            <button on:click={sendNewMessage}>
+                Send
+            </button>
+        </div> -->
+    </section>
+{/if}
+
+<style>
+    .chat-action {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background-color: black;
+        padding: 15px;
+        border-radius: 50%;
+    }
+
+    section.chat {
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        background-color: rgb(225, 225, 225);
+        z-index: 100;
+    }
+
+    section.chat .upper {
+        width: 100%;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        padding-left: 5px;
+        padding-right: 5px;
+        color: white;
+        background-color: rgb(24, 24, 24);
+    }
+
+    .upper h1 {
+        font-size: 25px;
+        font-weight: 600;
+    }
+
+    .upper button.go-back {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        filter: brightness(0.5);
+        transition: all linear 100ms;
+        margin-right: 10px;
+    }
+
+    .upper button.go-back:hover {
+        background-color: rgb(35, 35, 35);
+        filter: brightness(1.0);
+        box-shadow: 0px 0px 10px rgb(85, 85, 85);
+    }
+
+    main.chats-list {
+        color: black;
+        width: 100%;
+        height: calc(100% - 55px);
+        padding: 5px;
+    }
+
+    main.chats-list .entity {
+        height: 50px;
+        width: 100%;
+        background-color: whitesmoke;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    main.messages {
+        width: 100%;
+        height: calc(100% - 55px);
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        row-gap: 1px;
+    }
+
+    main.messages div.c {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    main.messages div.c.my {
+        justify-content: flex-end;
+    }
+
+    main.messages div.c div {
+        width: fit-content;
+        max-width: 49%;
+        background-color: blue;
+        color: white;
+        border-radius: 15px;
+        padding: 5px;
+    }
+
+    main.messages div.c.my div {
+        background-color: black;
+    }
+
+    main.messages div.c div p {
+        text-wrap: balance;
+        word-wrap: break-word;
+    }
+</style>
