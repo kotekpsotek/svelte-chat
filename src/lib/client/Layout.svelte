@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Chat, ChatLaunch, Return } from "carbon-icons-svelte";
+    import { Chat, ChatLaunch, Return, AddComment, Add } from "carbon-icons-svelte";
     import { io , type Socket} from "socket.io-client";
     import { onMount } from "svelte";
     import connection from "./connection.js";
@@ -85,6 +85,12 @@
                     <p class="n">Chat new name</p>
                 </button>
             </main>
+            <div class="bottom">
+                <button id="new">
+                    <p>Give Question</p>
+                    <AddComment size={24} fill="white"/>
+                </button>
+            </div>
         {:else}
             <div class="upper">
                 <button class="go-back" on:click={showOrHideChatMessages}>
@@ -126,6 +132,7 @@
     }
 
     section.chat {
+        --one-per-height: calc((100% - 55px) / 100);
         height: 100%;
         width: 100%;
         position: absolute;
@@ -134,7 +141,7 @@
         background-color: rgb(225, 225, 225);
         z-index: 100;
     }
-
+    
     section.chat .upper {
         width: 100%;
         height: 55px;
@@ -146,6 +153,43 @@
         background-color: rgb(24, 24, 24);
     }
 
+    section.chat .chats-list {
+        width: 100%;
+        height: calc(var(--one-per-height) * 90);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    section.chat .bottom {
+        width: 100%;
+        height: calc(var(--one-per-height) * 10);
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 5px;
+    }
+
+    button#new {
+        display: flex;
+        padding: 15px;
+        gap: 3px;
+        color: white;
+        align-items: center;
+        text-transform: uppercase;
+        font-weight: 700;
+        background-color: black;
+        border-radius: 5px;
+        margin-right: 5px;
+        cursor: pointer;
+        transition: all linear 100ms;
+    }
+
+    button#new:hover {
+        transform: scale(0.95);
+        box-shadow: 0px 0px 15px gray;
+    }
+    
     .upper h1 {
         font-size: 25px;
         font-weight: 600;
