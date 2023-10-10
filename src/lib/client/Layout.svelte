@@ -118,13 +118,15 @@
                 {#if chatsList.length}
                     {#each chatsList as chat}
                         <button class="entity" on:click={showOrHideChatMessages}>
-                            <ChatLaunch/>
+                            <ChatLaunch size={24}/>
                             <p class="n">{chat.name || new Date(chat.creation_date).toISOString()}</p>
                         </button>
                     {/each}
                 {:else}
                     <div class="no-chats">
-                        <p>👽🪐 You haven't any chat. Let's create new one! 🌎☄️</p>
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <p>👽🪐 You haven't any chat. Let's <span style="color: orangered; cursor: pointer;" on:click={createNewQuestion}>create new one</span>! 🌎☄️</p>
                     </div>
                 {/if}
             </main>
@@ -211,10 +213,22 @@
     }
 
     .chats-list button.entity {
+        height: 50px;
+        width: 100%;
+        background-color: whitesmoke;
+        display: flex;
+        align-items: center;
         padding-left: 5px;
         padding-right: 5px;
-        display: flex;
-        gap: 5px;
+        font-size: 15px;
+        gap: 10px;
+        transition: all linear 50ms;
+        cursor: pointer;
+    }
+
+    .chats-list button.entity:hover {
+        box-shadow: 0px 0px 10px grey;
+        border: solid grey 1px;
     }
 
     .chats-list .no-chats {
@@ -283,17 +297,6 @@
         width: 100%;
         height: calc(100% - 55px);
         /* padding: 5px; */
-    }
-
-    main.chats-list .entity {
-        height: 50px;
-        width: 100%;
-        background-color: whitesmoke;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        padding-left: 5px;
-        padding-right: 5px;
     }
 
     main.messages {
