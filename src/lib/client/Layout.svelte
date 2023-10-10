@@ -15,6 +15,7 @@
 
     let myId = "1"
     let chat = {
+        id: "",
         title: "",
         messages: [
             {
@@ -27,7 +28,8 @@
                 content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
                 date: Date.now()
             },
-        ]
+        ],
+        creation_date: new Date()
     }
     function showOrHideChatMessages() {
         conversationShowState = !conversationShowState;
@@ -44,6 +46,17 @@
         node.style.width = document.body.clientWidth - (cIW + 15) + "px";
         
         return {};
+    }
+
+    // After click on "give new question" button
+    function createNewQuestion() {
+        $connection?.emit("create-new-question", myId, (chatId: string, creationDate: string) => {
+            chat.id = chatId;
+            chat.title = new Date(creationDate).toLocaleDateString();
+            chat.messages = [],
+            chat.creation_date = new Date(creationDate);
+            conversationShowState = true
+        });
     }
 
     onMount(() => {
@@ -86,7 +99,7 @@
                 </button>
             </main>
             <div class="bottom">
-                <button id="new">
+                <button id="new" on:click={createNewQuestion}>
                     <p>Give Question</p>
                     <AddComment size={24} fill="white"/>
                 </button>

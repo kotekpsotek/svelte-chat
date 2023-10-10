@@ -40,6 +40,7 @@
 	"type": "module",
 	"dependencies": {
 		"carbon-icons-svelte": "^12.3.0",
+		"mongoose": "^7.6.1",
 		"socket.io": "^4.7.2",
 		"socket.io-client": "^4.7.2"
 	}
