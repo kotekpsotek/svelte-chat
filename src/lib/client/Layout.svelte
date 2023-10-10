@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Chat, ChatLaunch, Return, AddComment, Add } from "carbon-icons-svelte";
+    import { Chat, ChatLaunch, Return, AddComment, Add, Close } from "carbon-icons-svelte";
     import { io , type Socket} from "socket.io-client";
     import { onMount } from "svelte";
     import connection from "./connection.js";
@@ -76,6 +76,13 @@
         }
     }
 
+    /** Ability to close chat are supply by this function */
+    function closeChat() {
+        chatStateShow = false;
+        conversationShowState = false;
+        chat = Object.create(null);
+    }
+
     onMount(() => {
         $connection = io("http://localhost:10501");
         const getId = (() => {
@@ -109,10 +116,21 @@
 {#if chatStateShow}
     <!-- TODO: 1. List of stated prior chats by date, 2. Chat messages, 3. Ability to send new message -->
     <section class="chat" use:spawnChatList>
-        {#if !conversationShowState}
-            <div class="upper">
+        <div class="upper">
+            <!-- Close chat element -->
+            {#if !conversationShowState}
                 <h1>Chats list</h1>
-            </div>
+            {:else}
+                <button class="go-back" on:click={showOrHideChatMessages}>
+                    <Return size={24}/>
+                </button>
+                <h1>Chat conversation ({chat.title.length ? chat.title : "No Name"})</h1>
+            {/if}
+            <button id="close-chat" on:click={closeChat}>
+                <Close size={32} fill="white"/>
+            </button>
+        </div>
+        {#if !conversationShowState}
             <main class="chats-list">
                 <!-- Chats list -->
                 {#if chatsList.length}
@@ -137,12 +155,6 @@
                 </button>
             </div>
         {:else}
-            <div class="upper">
-                <button class="go-back" on:click={showOrHideChatMessages}>
-                    <Return size={24}/>
-                </button>
-                <h1>Chat conversation ({chat.title.length ? chat.title : "No Name"})</h1>
-            </div>
             <main class="messages">
                 {#if chat.messages.length}
                     {#each chat.messages as message}
@@ -169,6 +181,8 @@
 {/if}
 
 <style>
+    @import url("./styles.css");
+    
     * {
         font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -194,6 +208,7 @@
     }
     
     section.chat .upper {
+        position: relative;
         width: 100%;
         height: 55px;
         display: flex;
@@ -202,6 +217,25 @@
         /* padding-right: 5px; */
         color: white;
         background-color: rgb(24, 24, 24);
+    }
+
+    .upper button#close-chat {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        width: 50px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        cursor: pointer;
+        transition: all linear 50ms
+    }
+
+    .upper button#close-chat:hover {
+        background-color: white;
+        border: solid 1px grey;
     }
 
     section.chat .chats-list {
