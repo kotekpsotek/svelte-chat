@@ -3,6 +3,7 @@
     import { io , type Socket} from "socket.io-client";
     import { onMount } from "svelte";
     import connection from "./connection.js";
+    import ChatPrompt from "./ChatPrompt.svelte";
 
     let chatStateShow = true;
     let conversationShowState = false;
@@ -50,13 +51,28 @@
 
     // After click on "give new question" button
     function createNewQuestion() {
-        $connection?.emit("create-new-question", myId, (chatId: string, creationDate: string) => {
-            chat.id = chatId;
-            chat.title = new Date(creationDate).toLocaleDateString();
-            chat.messages = [],
-            chat.creation_date = new Date(creationDate);
-            conversationShowState = true
+        const additionalPrompt = new ChatPrompt({
+            target: document.body,
         });
+
+        additionalPrompt.$on("skip", () => {
+            emit();
+        });
+
+        additionalPrompt.$on("confirm", () => {
+            emit(additionalPrompt.caseTitle, additionalPrompt.firstQuestionContent);
+        });
+
+        const emit = (title?: string, messageContent?: string) => {
+            additionalPrompt.$destroy();
+            $connection?.emit("create-new-question", myId, title, messageContent, (chatId: string, creationDate: string, title: string | undefined, messages: Record<string, any>[] | undefined) => {
+                chat.id = chatId;
+                chat.title = title || new Date(creationDate).toLocaleDateString();
+                chat.messages = messages as any || [],
+                chat.creation_date = new Date(creationDate);
+                conversationShowState = true
+            });
+        }
     }
 
     onMount(() => {

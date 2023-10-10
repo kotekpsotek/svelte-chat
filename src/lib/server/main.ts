@@ -21,15 +21,25 @@ function makeServer() {
             cb(randomUUID());
         });
 
-        socket.on("create-new-question", async (userId: string, cb) => {
+        socket.on("create-new-question", async (userId: string, title: string | undefined, firstMessageContent: string | undefined, cb) => {
             const chatId = randomUUID();
 
             // Create new chat in mongodb storage
             const created = await mongodb.model.create({
+                name: title,
+                messages: firstMessageContent ? [
+                    {
+                        content: firstMessageContent,
+                        user_id: userId,
+                        date: new Date()
+                    }
+                ]
+                :
+                undefined,
                 user_creator: userId
             });
 
-            cb(chatId, created.creation_date);
+            cb(chatId, created.creation_date, title, created.messages);
         });
     })
     
