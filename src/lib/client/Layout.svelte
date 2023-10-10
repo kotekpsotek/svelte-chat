@@ -20,12 +20,12 @@
         title: "",
         messages: [
             {
-                from: "1",
+                user_id: "1",
                 content: "Message 1",
                 date: Date.now()
             },
             {
-                from: "2",
+                user_id: "2",
                 content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
                 date: Date.now()
             },
@@ -128,13 +128,19 @@
                 <h1>Chat conversation ({chat.title.length ? chat.title : "No Name"})</h1>
             </div>
             <main class="messages">
-                {#each chat.messages as message}
-                    <div class="c" class:my={message.from == myId}>
-                        <div>
-                            <p>{message.content}</p>
+                {#if chat.messages.length}
+                    {#each chat.messages as message}
+                        <div class="c" class:my={message.user_id == myId}>
+                            <div>
+                                <p>{message.content}</p>
+                            </div>
                         </div>
+                    {/each}
+                {:else}
+                    <div class="no-messages">
+                        <p>💬 Chat is empty. Let's fill it 📟!</p>
                     </div>
-                {/each}
+                {/if}
             </main>
         {/if}
        <!--  <div class="msg">
@@ -295,5 +301,13 @@
     main.messages div.c div p {
         text-wrap: balance;
         word-wrap: break-word;
+    }
+
+    main.messages .no-messages {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 5px;
+        color: grey;
     }
 </style>
