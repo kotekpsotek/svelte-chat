@@ -41,6 +41,11 @@ function makeServer() {
 
             cb(chatId, created.creation_date, title, created.messages);
         });
+
+        socket.on("get-chats", async (userId: string, cb) => {
+            const chats = await mongodb.model.find({ user_creator: { $eq: userId } });
+            cb(chats)
+        });
     })
     
     http_server.listen(10501)

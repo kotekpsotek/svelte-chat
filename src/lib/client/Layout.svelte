@@ -15,6 +15,7 @@
     }
 
     let myId = "1"
+    let chatsList: Record<string, any>[] = []
     let chat = {
         id: "",
         title: "",
@@ -94,6 +95,11 @@
 
             return uId;
         })();
+
+        // Get user chats list
+        $connection.emit("get-chats", getId, (chats: Record<string, any>[]) => {
+            chatsList = chats;
+        })
     })
 </script>
 
@@ -109,10 +115,18 @@
             </div>
             <main class="chats-list">
                 <!-- Chats list -->
-                <button class="entity" on:click={showOrHideChatMessages}>
-                    <ChatLaunch/>
-                    <p class="n">Chat new name</p>
-                </button>
+                {#if chatsList.length}
+                    {#each chatsList as chat}
+                        <button class="entity" on:click={showOrHideChatMessages}>
+                            <ChatLaunch/>
+                            <p class="n">{chat.name || new Date(chat.creation_date).toISOString()}</p>
+                        </button>
+                    {/each}
+                {:else}
+                    <div class="no-chats">
+                        <p>👽🪐 You haven't any chat. Let's create new one! 🌎☄️</p>
+                    </div>
+                {/if}
             </main>
             <div class="bottom">
                 <button id="new" on:click={createNewQuestion}>
@@ -194,6 +208,22 @@
         display: flex;
         flex-direction: column;
         gap: 2px;
+    }
+
+    .chats-list button.entity {
+        padding-left: 5px;
+        padding-right: 5px;
+        display: flex;
+        gap: 5px;
+    }
+
+    .chats-list .no-chats {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: grey;
     }
     
     section.chat .bottom {
