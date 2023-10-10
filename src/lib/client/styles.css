@@ -1,0 +1,7 @@
+.upper button#close-chat > svg {
+    transition: all linear 500ms;
+}
+
+.upper button#close-chat:hover > svg {
+    fill: black;
+}

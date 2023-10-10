@@ -10,10 +10,6 @@
 
     let newMessageContent: string = "";
 
-    function loadChat() {
-        chatStateShow = !chatStateShow;
-    }
-
     let myId = "1"
     let chatsList: Record<string, any>[] = []
     let chat = {
@@ -33,8 +29,28 @@
         ],
         creation_date: new Date()
     }
+
+    /** Download chats list from socket.io server */
+    const downloadChats = () => {
+        $connection?.emit("get-chats", myId, (chats: Record<string, any>[]) => {
+            chatsList = chats;
+        })
+    };
+
+    function loadChat() {
+        chatStateShow = !chatStateShow;
+
+        if (chatStateShow) {
+            // Get user chats list
+            downloadChats()
+        }
+    }
+
     function showOrHideChatMessages() {
         conversationShowState = !conversationShowState;
+
+        // Get user chats list
+        downloadChats()
     }
 
     function sendNewMessage() {
@@ -104,9 +120,7 @@
         })();
 
         // Get user chats list
-        $connection.emit("get-chats", getId, (chats: Record<string, any>[]) => {
-            chatsList = chats;
-        })
+        downloadChats();
     })
 </script>
 
