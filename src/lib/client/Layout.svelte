@@ -8,8 +8,6 @@
     let chatStateShow = false;
     let conversationShowState = false;
 
-    let newMessageContent: string = "";
-
     let myId = "1"
     let chatsList: Record<string, any>[] = []
     let chat = {
@@ -69,10 +67,6 @@
         }
     }
 
-    function sendNewMessage() {
-
-    }
-
     function spawnChatList(node: HTMLElement) {
         const chatIcon = document.getElementById("c-ico");
         const cIW = chatIcon!.clientWidth;
@@ -115,6 +109,28 @@
         chat = Object.create(null);
     }
 
+    /** Manage focus on input to pass new message content */
+    let focusOnMessageInput = false;
+    function focusMessageInput(state: boolean) {
+        return () => {
+            focusOnMessageInput = state;
+        }
+    }
+    
+    /** Send new message */
+    let messageChatContent: string = "";
+    function sendNewMessage() {
+        if (messageChatContent.length) {
+            $connection?.emit("new-message", chat.id, messageChatContent, (success: boolean, message: typeof chat.messages[0]) => {
+                if (success) {
+                    chat.messages = [...chat.messages, message];
+                    messageChatContent = "";
+                }
+                else alert("Couldn't send message. Please try again!");
+            });
+        }
+    }
+
     onMount(() => {
         $connection = io("http://localhost:10501");
         const getId = (() => {
@@ -137,6 +153,11 @@
 
         // Get user chats list
         downloadChats();
+
+        // Send message when user has got focus on input to pass new message content
+        window.addEventListener("keypress", ({ code }) => {
+            if (code == "Enter") sendNewMessage();
+        });
     })
 </script>
 
@@ -202,8 +223,8 @@
                     </div>
                 {/if}
                 <div class="write-message">
-                    <input type="text" placeholder="Message...">
-                    <button title="send">
+                    <input type="text" placeholder="Message..." bind:value={messageChatContent} on:focus={focusMessageInput(true)} on:blur={focusMessageInput(false)}>
+                    <button title="send" on:click={sendNewMessage}>
                         <SendFilled size={24} fill="white"/>
                     </button>
                 </div>
