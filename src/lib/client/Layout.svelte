@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { Chat, ChatLaunch, Return, AddComment, Add, Close } from "carbon-icons-svelte";
+    import { Chat, ChatLaunch, Return, AddComment, Add, Close, SendFilled } from "carbon-icons-svelte";
     import { io , type Socket} from "socket.io-client";
     import { onMount } from "svelte";
     import connection from "./connection.js";
     import ChatPrompt from "./ChatPrompt.svelte";
 
     let chatStateShow = true;
-    let conversationShowState = false;
+    let conversationShowState = true;
 
     let newMessageContent: string = "";
 
@@ -16,6 +16,56 @@
         id: "",
         title: "",
         messages: [
+            {
+                user_id: "1",
+                content: "Message 1",
+                date: Date.now()
+            },
+            {
+                user_id: "2",
+                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
+                date: Date.now()
+            },
+            {
+                user_id: "1",
+                content: "Message 1",
+                date: Date.now()
+            },
+            {
+                user_id: "2",
+                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
+                date: Date.now()
+            },
+            {
+                user_id: "1",
+                content: "Message 1",
+                date: Date.now()
+            },
+            {
+                user_id: "2",
+                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
+                date: Date.now()
+            },
+            {
+                user_id: "1",
+                content: "Message 1",
+                date: Date.now()
+            },
+            {
+                user_id: "2",
+                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
+                date: Date.now()
+            },
+            {
+                user_id: "1",
+                content: "Message 1",
+                date: Date.now()
+            },
+            {
+                user_id: "2",
+                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
+                date: Date.now()
+            },
             {
                 user_id: "1",
                 content: "Message 1",
@@ -171,18 +221,26 @@
         {:else}
             <main class="messages">
                 {#if chat.messages.length}
-                    {#each chat.messages as message}
-                        <div class="c" class:my={message.user_id == myId}>
-                            <div>
-                                <p>{message.content}</p>
+                    <div class="messages-markup">
+                        {#each chat.messages as message}
+                            <div class="c" class:my={message.user_id == myId}>
+                                <div>
+                                    <p>{message.content}</p>
+                                </div>
                             </div>
-                        </div>
-                    {/each}
+                        {/each}
+                    </div>
                 {:else}
                     <div class="no-messages">
                         <p>💬 Chat is empty. Let's fill it 📟!</p>
                     </div>
                 {/if}
+                <div class="write-message">
+                    <input type="text" placeholder="Message...">
+                    <button title="send">
+                        <SendFilled size={24} fill="white"/>
+                    </button>
+                </div>
             </main>
         {/if}
        <!--  <div class="msg">
@@ -390,5 +448,45 @@
         justify-content: center;
         padding: 5px;
         color: grey;
+    }
+
+    main.messages .messages-markup {
+        width: 100%;
+        height: calc(100% - 80px);
+        padding: 5px;
+        overflow-y: auto;
+    }
+
+    main.messages .write-message {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        background-color: whitesmoke;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    main.messages .write-message input {
+        width: 95%;
+        height: 50%;
+        padding-left: 5px;
+        padding-right: 5px;
+        border: solid 1px grey;
+        border-right: none;
+        border-radius: 5px;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
+        outline: none;
+    }
+
+    main.messages .write-message button {
+        width: 5%;
+        height: 52%;
+        border: 1px grey solid;
+        border-left: none;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        background-color: black;
+        cursor: pointer;
     }
 </style>
