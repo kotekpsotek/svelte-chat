@@ -121,8 +121,8 @@
     let messageChatContent: string = "";
     function sendNewMessage() {
         if (messageChatContent.length) {
-            $connection?.emit("new-message", chat.id, messageChatContent, (success: boolean, message: typeof chat.messages[0]) => {
-                if (success) {
+            $connection?.emit("new-message", myId, chat.id, messageChatContent, (success: boolean, message: typeof chat.messages[0] | undefined) => {
+                if (success && message) {
                     chat.messages = [...chat.messages, message];
                     messageChatContent = "";
                 }

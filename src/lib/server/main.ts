@@ -44,6 +44,34 @@ function makeServer() {
             const chats = await mongodb.model.find({ user_creator: { $eq: userId } });
             cb(chats)
         });
+
+        socket.on("new-message", async (userId: string, chatId: string, messageContent: string, cb: (success: boolean, message: Record<string, any> | undefined) => void) => {
+            try {
+                const searchQuery = { $and: [{ id: { $eq: chatId } }, { $or: [{ user_creator: { $eq: userId } }, { "messages.user_id": { $eq: userId } }]}] };
+                if (await mongodb.model.exists({ ...searchQuery, $comment: "Check whether user is in chat (specified by chat ID) before add his message to it" })) {
+                    // Compose new message
+                    const new_message: mongodb.ChatSchema["messages"][0] = {
+                        user_id: userId,
+                        content: messageContent,
+                        date: new Date()
+                    };
+    
+                    // Pass new message to database
+                    const updated = await mongodb.model.findOneAndUpdate(searchQuery, {
+                        $push: {
+                            messages: new_message
+                        }
+                    }, { new: true });
+
+                    // Send to client success result
+                    cb(true, new_message)
+                }
+                else cb(false, undefined);
+            }
+            catch(err) {
+                cb(false, undefined)
+            }
+        });
     })
     
     http_server.listen(10501)
