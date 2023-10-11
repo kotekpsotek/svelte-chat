@@ -5,8 +5,8 @@
     import connection from "./connection.js";
     import ChatPrompt from "./ChatPrompt.svelte";
 
-    let chatStateShow = true;
-    let conversationShowState = true;
+    let chatStateShow = false;
+    let conversationShowState = false;
 
     let newMessageContent: string = "";
 
@@ -14,7 +14,7 @@
     let chatsList: Record<string, any>[] = []
     let chat = {
         id: "",
-        title: "",
+        name: "",
         messages: [
             {
                 user_id: "1",
@@ -29,51 +29,6 @@
             {
                 user_id: "1",
                 content: "Message 1",
-                date: Date.now()
-            },
-            {
-                user_id: "2",
-                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
-                date: Date.now()
-            },
-            {
-                user_id: "1",
-                content: "Message 1",
-                date: Date.now()
-            },
-            {
-                user_id: "2",
-                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
-                date: Date.now()
-            },
-            {
-                user_id: "1",
-                content: "Message 1",
-                date: Date.now()
-            },
-            {
-                user_id: "2",
-                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
-                date: Date.now()
-            },
-            {
-                user_id: "1",
-                content: "Message 1",
-                date: Date.now()
-            },
-            {
-                user_id: "2",
-                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
-                date: Date.now()
-            },
-            {
-                user_id: "1",
-                content: "Message 1",
-                date: Date.now()
-            },
-            {
-                user_id: "2",
-                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
                 date: Date.now()
             },
         ],
@@ -96,11 +51,22 @@
         }
     }
 
-    function showOrHideChatMessages() {
-        conversationShowState = !conversationShowState;
-
-        // Get user chats list
-        downloadChats()
+    function showOrHideChatMessages(chatId?: string) {
+        return () => {
+            // Get chat messages
+            if (!chatId) {
+                // Get user chats list
+                downloadChats()
+            }
+            else {
+                // Download specified chat messages content
+                const chatInternal = chatsList.find(c => c.id == chatId);
+                chat = chatInternal as any;
+            }
+            
+            // Show chat messages
+            conversationShowState = !conversationShowState;
+        }
     }
 
     function sendNewMessage() {
@@ -134,7 +100,7 @@
             additionalPrompt.$destroy();
             $connection?.emit("create-new-question", myId, title, messageContent, (chatId: string, creationDate: string, title: string | undefined, messages: Record<string, any>[] | undefined) => {
                 chat.id = chatId;
-                chat.title = title || new Date(creationDate).toLocaleDateString();
+                chat.name = title || new Date(creationDate).toLocaleDateString();
                 chat.messages = messages as any || [],
                 chat.creation_date = new Date(creationDate);
                 conversationShowState = true
@@ -185,10 +151,10 @@
             {#if !conversationShowState}
                 <h1>Chats list</h1>
             {:else}
-                <button class="go-back" on:click={showOrHideChatMessages}>
+                <button class="go-back" on:click={showOrHideChatMessages(undefined)}>
                     <Return size={24}/>
                 </button>
-                <h1>Chat conversation ({chat.title.length ? chat.title : "No Name"})</h1>
+                <h1>Chat conversation ({chat.name.length ? chat.name : "No Name"})</h1>
             {/if}
             <button id="close-chat" on:click={closeChat}>
                 <Close size={32} fill="white"/>
@@ -199,7 +165,7 @@
                 <!-- Chats list -->
                 {#if chatsList.length}
                     {#each chatsList as chat}
-                        <button class="entity" on:click={showOrHideChatMessages}>
+                        <button class="entity" on:click={showOrHideChatMessages(chat.id)}>
                             <ChatLaunch size={24}/>
                             <p class="n">{chat.name || new Date(chat.creation_date).toISOString()}</p>
                         </button>
@@ -451,6 +417,7 @@
     }
 
     main.messages .messages-markup {
+        box-sizing: border-box;
         width: 100%;
         height: calc(100% - 80px);
         padding: 5px;
