@@ -164,6 +164,11 @@
         window.addEventListener("keypress", ({ code }) => {
             if (code == "Enter") sendNewMessage();
         });
+
+        // Capture new messages from other "client" in room
+        $connection.on("capture-new-message", (newMessage: typeof chat.messages[0]) => {
+            chat.messages = [...chat.messages, newMessage];
+        });
     })
 </script>
 

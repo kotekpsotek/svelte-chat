@@ -81,6 +81,10 @@ function makeServer() {
                         }
                     }, { new: true });
 
+                    // Send new message attention to other "client" in room
+                    socket.in(chatId)
+                        .emit("capture-new-message", new_message);
+
                     // Send to client success result
                     cb(true, new_message)
                 }
