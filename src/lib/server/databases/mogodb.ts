@@ -1,6 +1,8 @@
 import mongoose, { Schema } from "mongoose";
+import { randomUUID } from "crypto";
 
 interface ChatSchema {
+    id: string,
     name?: string,
     messages: {
         content: string
@@ -12,6 +14,7 @@ interface ChatSchema {
 }
 
 const chatSchema = new Schema<ChatSchema>({
+    id: { type: String, default: () => randomUUID() },
     name: { type: String },
     messages: { type: [Object], default: [] },
     creation_date: { 

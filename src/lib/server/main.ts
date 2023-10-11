@@ -22,8 +22,6 @@ function makeServer() {
         });
 
         socket.on("create-new-question", async (userId: string, title: string | undefined, firstMessageContent: string | undefined, cb) => {
-            const chatId = randomUUID();
-
             // Create new chat in mongodb storage
             const created = await mongodb.model.create({
                 name: title,
@@ -39,7 +37,7 @@ function makeServer() {
                 user_creator: userId
             });
 
-            cb(chatId, created.creation_date, title, created.messages);
+            cb(created.id, created.creation_date, title, created.messages);
         });
 
         socket.on("get-chats", async (userId: string, cb) => {
