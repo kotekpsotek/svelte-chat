@@ -41,6 +41,9 @@ function makeServer() {
                 user_creator: userId
             });
 
+            // Join user to chat room (by chat id)
+            socket.join(created.id);
+
             cb(created.id, created.creation_date, title, created.messages);
         });
 
