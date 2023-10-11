@@ -53,6 +53,9 @@
         return () => {
             // Get chat messages
             if (!chatId) {
+                // Emit leave user chat
+                $connection?.emit("leave-chat", chat.id);
+                
                 // Get user chats list
                 downloadChats()
             }

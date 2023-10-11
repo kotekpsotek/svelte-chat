@@ -55,6 +55,12 @@ function makeServer() {
             }
         });
 
+        socket.on("leave-chat", (chatId: string) => {
+            if (socket.rooms.has(chatId)) {
+                socket.leave(chatId);
+            }
+        });
+
         socket.on("new-message", async (userId: string, chatId: string, messageContent: string, cb: (success: boolean, message: Record<string, any> | undefined) => void) => {
             try {
                 if (await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before add his message to it" })) {
