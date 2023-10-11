@@ -57,6 +57,9 @@
                 downloadChats()
             }
             else {
+                // Emit join user to specific chat room
+                $connection?.emit("join-to-chat", chatId, myId)
+                
                 // Download specified chat messages content
                 const chatInternal = chatsList.find(c => c.id == chatId);
                 chat = chatInternal as any;

@@ -17,6 +17,10 @@ function makeServer() {
     });
     
     socket_server.on("connect", (socket) => {
+        const conditionInteractionWithChat = (chatId: string, userId: string) => {
+            return { $and: [{ id: { $eq: chatId } }, { $or: [{ user_creator: { $eq: userId } }, { "messages.user_id": { $eq: userId } }]}] }
+        };
+        
         socket.on("generate-my-id", (cb) => {
             cb(randomUUID());
         });
@@ -45,10 +49,15 @@ function makeServer() {
             cb(chats)
         });
 
+        socket.on("join-to-chat", async (chatId: string, userId: string) => {
+            if (await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before join hsi present to this chat room" })) {
+                socket.join(chatId);
+            }
+        });
+
         socket.on("new-message", async (userId: string, chatId: string, messageContent: string, cb: (success: boolean, message: Record<string, any> | undefined) => void) => {
             try {
-                const searchQuery = { $and: [{ id: { $eq: chatId } }, { $or: [{ user_creator: { $eq: userId } }, { "messages.user_id": { $eq: userId } }]}] };
-                if (await mongodb.model.exists({ ...searchQuery, $comment: "Check whether user is in chat (specified by chat ID) before add his message to it" })) {
+                if (await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before add his message to it" })) {
                     // Compose new message
                     const new_message: mongodb.ChatSchema["messages"][0] = {
                         user_id: userId,
@@ -57,7 +66,7 @@ function makeServer() {
                     };
     
                     // Pass new message to database
-                    const updated = await mongodb.model.findOneAndUpdate(searchQuery, {
+                    const updated = await mongodb.model.findOneAndUpdate(conditionInteractionWithChat(chatId, userId), {
                         $push: {
                             messages: new_message
                         }
