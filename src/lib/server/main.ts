@@ -1,7 +1,9 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { randomUUID } from "crypto";
-import type { PluginOption } from "vite";
+import type { PluginOption, ViteDevServer } from "vite";
+import express from "express";
+import { handler as svelteKitAdminApp } from "../client/admin/build/handler.js";
 
 // Databases
 import * as mongodb from "./databases/mogodb.js";
@@ -99,6 +101,18 @@ function makeServer() {
     http_server.listen(10501)
 }
 
+// 
+const PORT_ADMIN = 10502;
+function makeAdminPanelRouting() {
+    const app = express();
+
+    // Let sveltekit application work
+    app.use(svelteKitAdminApp);
+
+    // Listen addmin app on specified port
+    app.listen(PORT_ADMIN);
+}
+
 export class ServerChatHandler {
     constructor() {
         makeServer()
@@ -109,6 +123,7 @@ export const svelteChatPlugin = {
     name: "svelte-chat-plugin",
     configureServer(server) {
         makeServer();
+        makeAdminPanelRouting();
         console.log("Svelte-Chat plugin is on work!");
     }
 } as PluginOption
