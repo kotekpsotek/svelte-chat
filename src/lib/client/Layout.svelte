@@ -73,7 +73,8 @@
         }
     }
 
-    function spawnChatList(node: HTMLElement) {
+    /** Add styles for spawn <section class="chat"> element */
+    function spawnChatSection(node: HTMLElement) {
         const chatIcon = document.getElementById("c-ico");
         const cIW = chatIcon!.clientWidth;
 
@@ -160,6 +161,12 @@
         // Get user chats list
         downloadChats();
 
+        // Durning window size change
+        window.addEventListener("resize", () => {
+            // Change size for <section class="chat"> element
+            spawnChatSection(document.querySelector('section.chat')!)
+        })
+
         // Send message when user has got focus on input to pass new message content
         window.addEventListener("keypress", ({ code }) => {
             if (code == "Enter") sendNewMessage();
@@ -177,7 +184,7 @@
 </button>
 {#if chatStateShow}
     <!-- TODO: 1. List of stated prior chats by date, 2. Chat messages, 3. Ability to send new message -->
-    <section class="chat" use:spawnChatList>
+    <section class="chat" use:spawnChatSection>
         <div class="upper">
             <!-- Close chat element -->
             {#if !conversationShowState}
