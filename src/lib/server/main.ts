@@ -1,8 +1,12 @@
+
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { randomUUID } from "crypto";
 import type { PluginOption, ViteDevServer } from "vite";
 import express from "express";
+
+// Setup SvelteKit Admin app Handler for production
+process.env["ORIGIN"] = "http://localhost:10502";
 import { handler as svelteKitAdminApp } from "../client/admin/build/handler.js";
 
 // Databases
@@ -103,6 +107,10 @@ function makeServer() {
 
 // 
 const PORT_ADMIN = 10502;
+/**
+ * @summary To Run SvelteKit Admin app you should put environment required variables (full list below) before run command so like this: ORIGIN="SvelteKitAdminAppRoute e.g: http://localhost:10502" npm run dev. In Windows this is only possible throught WSL or any Bash shell 
+ * @description Required Environment variables: ORIGIN="Origin where your SvelteKit admin app occurs"
+*/
 function makeAdminPanelRouting() {
     const app = express();
 

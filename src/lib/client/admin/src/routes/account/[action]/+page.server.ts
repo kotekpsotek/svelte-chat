@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-export const load = ({ params }) => {
+export const load = ({ locals, params }) => {
     return {
         for: params.action == "signin" ? "signin" : "signup"
     }
