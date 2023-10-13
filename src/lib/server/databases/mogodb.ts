@@ -26,13 +26,29 @@ const chatSchema = new Schema<ChatSchema>({
     user_creator: { type: String, required: true }
 });
 
+interface AdminSchema {
+    name: string,
+    email: string,
+    password: string,
+    creation_date: Date
+}
+
+const adminSchema = new Schema<AdminSchema>({
+    name: String,
+    email: String,
+    password: String,
+    creation_date: { type: Date, default: () => new Date() }
+})
+
 /** Make connection and model for mongodb */
 function makeConnectionAndModel() {
     const connection = mongoose.createConnection("mongodb://localhost:27017", {
         dbName: "svelte-chat",
     });
-    const model = connection.model("svelte-chats", chatSchema, "sv-chats-collection");
-    return { connection, model };
+    const modelChats = connection.model("svelte-chats", chatSchema, "sv-chats-collection");
+    const modelAdmin = connection.model("admin", adminSchema);
+
+    return { connection, model: modelChats, modelAdmin };
 }
 
 export const { model, connection } = makeConnectionAndModel()
