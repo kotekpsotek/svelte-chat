@@ -54,7 +54,8 @@ function makeServer() {
         });
 
         socket.on("get-chats", async (userId: string, cb) => {
-            const chats = await mongodb.model.find({ user_creator: { $eq: userId } });
+            const chats = await mongodb.model.find({ user_creator: { $eq: userId } })
+                .sort({ creation_date: "desc" });
             cb(chats)
         });
 

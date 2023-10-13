@@ -449,6 +449,7 @@
 
     main.messages .no-messages {
         width: 100%;
+        height: calc(100% - 80px);
         display: flex;
         justify-content: center;
         padding: 5px;
@@ -459,6 +460,9 @@
         box-sizing: border-box;
         width: 100%;
         height: calc(100% - 80px);
+        display: flex;
+        flex-direction: column;
+        row-gap: 2px;
         padding: 5px;
         overflow-y: auto;
     }
