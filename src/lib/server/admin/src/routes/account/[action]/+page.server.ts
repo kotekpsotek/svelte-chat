@@ -1,11 +1,20 @@
 import crypto from "crypto";
 import * as mongodb from "../../../../../databases/mogodb";
 import * as session from "$lib/session";
+import { error } from "@sveltejs/kit";
 
-export const load = ({ locals, params }) => {
-    return {
-        for: params.action == "signin" ? "signin" : "signup"
+export const load = async ({ locals, params, cookies }) => {
+    const cookieSes = session.SessionRead.getSessionId(cookies);
+    console.log(cookieSes, await session.SessionRead.alreadyLoggedin(cookieSes!))
+    if (cookieSes && await session.SessionRead.alreadyLoggedin(cookieSes)) {
+        throw error(401, { message: "You're actually login" });
     }
+    else {
+        return {
+            for: params.action == "signin" ? "signin" : "signup"
+        }
+    }
+    
 }
 
 function passwordToCheckByHash(password: string) {

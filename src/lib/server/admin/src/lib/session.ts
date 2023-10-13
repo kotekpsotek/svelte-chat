@@ -55,7 +55,8 @@ export class SessionRead {
         if (cookieSes) {
             // Check in databse
             sessionAdminCookiesModel.exists({ 
-                sess_id: cookieSes
+                sess_id: cookieSes,
+                expiration_date: { $gte: new Date() }
             }).then(async res => {
                 if (res) {
                     locals.login = true
@@ -79,5 +80,19 @@ export class SessionRead {
             })
             
         }
+    }
+
+    // Get actual session ID
+    static getSessionId(cookies: Cookies) {
+        const sess = cookies.get("sess");
+        return sess || undefined;
+    }
+
+    /** Check session id is in database and is actual */
+    static async alreadyLoggedin(sessionId: string): Promise<boolean> {
+        return await sessionAdminCookiesModel.exists({
+            sess_id: sessionId,
+            expiration_date: { $gt: new Date() }
+        }) != null;
     }
 }
