@@ -38,7 +38,15 @@ const adminSchema = new Schema<AdminSchema>({
     email: String,
     password: String,
     creation_date: { type: Date, default: () => new Date() }
-})
+});
+
+interface AuthAdminsEmailsSchema {
+    email: string
+}
+
+const authAdminSchema = new Schema<AuthAdminsEmailsSchema>({
+    email: { type: String, required: true }
+});
 
 /** Make connection and model for mongodb */
 function makeConnectionAndModel() {
@@ -47,9 +55,11 @@ function makeConnectionAndModel() {
     });
     const modelChats = connection.model("svelte-chats", chatSchema, "sv-chats-collection");
     const modelAdmin = connection.model("admin", adminSchema);
+    const modelAuthAdmin = connection.model("admin_auth", authAdminSchema);
 
-    return { connection, model: modelChats, modelAdmin };
+    return { connection, model: modelChats, modelAdmin, modelAuthAdmin };
 }
 
-export const { model, connection } = makeConnectionAndModel()
-export { chatSchema, type ChatSchema }
+export const { model, connection, modelAdmin, modelAuthAdmin } = makeConnectionAndModel()
+export { chatSchema, adminSchema, authAdminSchema };
+export type { ChatSchema, AdminSchema, AuthAdminsEmailsSchema };
