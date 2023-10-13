@@ -7,7 +7,7 @@ import express from "express";
 
 // Setup SvelteKit Admin app Handler for production
 process.env["ORIGIN"] = "http://localhost:10502";
-import { handler as svelteKitAdminApp } from "../client/admin/build/handler.js";
+import { handler as svelteKitAdminApp } from "./admin/build/handler.js";
 
 // Databases
 import * as mongodb from "./databases/mogodb.js";

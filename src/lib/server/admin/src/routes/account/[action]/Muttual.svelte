@@ -1,6 +1,20 @@
 <script lang="ts">
     import { page } from "$app/stores";
+    import { goto } from "$app/navigation";
+    import { browser } from "$app/environment";
     const dt = $page.data;
+
+    if (browser) {
+        if ($page.form?.action && $page.form.success) {
+            alert($page.form.action == "signup" ? "You have made administrator account!" : "You have been logged-in as administrator");
+            if ($page.form.action == "signin") {
+                goto("/panel");
+            }
+        }
+        else if ($page.form?.action) {
+            alert($page.form.action == "signup" ? "You cannot make administrator account from some reason!" : "You pass incorrect signin datas");
+        }
+    }
 
     function stopPaste(ev: Event) {
         ev.preventDefault();
@@ -8,6 +22,7 @@
 
     type ActionTypes = "signin" | "signup";
 
+    let name = "";
     let email = "";
     let password: string = "";
     let passwordCheck = ""
@@ -17,7 +32,7 @@
             // Prevent from send form to server only in specific cases
             switch (ac) {
                 case "signup":
-                    if (!(email || password && password == passwordCheck)) {
+                    if (!(email || password && password == passwordCheck || name.length)) {
                         ev.preventDefault();
                         alert("You must confirm your account verification by passthrought required datas to form fields: 'email', 'password', 'password correcteness check'");
                     }
@@ -41,6 +56,7 @@
             <input name="email" type="email" placeholder="Email" bind:value={email} on:paste={stopPaste}>
             <input name="password" type="password" placeholder="Password" bind:value={password} on:paste={stopPaste}>
         {:else if dt.for == "signup"}
+            <input name="name" type="text" placeholder="Name" bind:value={name}/>
             <input name="email" type="email" placeholder="Email" bind:value={email} on:paste={stopPaste}/>
             <input name="password" type="password" placeholder="Password" bind:value={password} on:paste={stopPaste}>
             <input type="password" placeholder="Password Check" bind:value={passwordCheck} on:paste={stopPaste}/>

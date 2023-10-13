@@ -30,7 +30,7 @@ interface AdminSchema {
     name: string,
     email: string,
     password: string,
-    creation_date: Date
+    creation_date?: Date
 }
 
 const adminSchema = new Schema<AdminSchema>({

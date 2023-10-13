@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import * as mongodb from "../../../../../databases/mogodb";
 
 export const load = ({ locals, params }) => {
     return {
@@ -18,6 +19,7 @@ export const actions = {
         
         const data = await request.formData();
         const [email, password] = [data.get("email") as string, data.get("password") as string];
+        console.log(mongodb)
         
         // Conditions
         const passwordToCheckExistance = passwordToCheckByHash(password); // TODO: use it
@@ -34,15 +36,25 @@ export const actions = {
         let statusAction = false;
 
         const data = await request.formData();
-        const [email, password]: [string, string] = [data.get("email") as any, data.get("password") as any];
+        const [name, email, password] = [data.get("name") as string, data.get("email") as string, data.get("password") as string];
     
         // Conditions
         const passCond = password?.length >= 8 && password?.length <= 20 && password.match(/\d/gi)?.length && password.match(/[A-Z]/g)?.length && password.match(/a-z/g)?.length && password.match(/\W/g)?.length;
-        const emailCond = true; // TODO:
+        const emailCond = await (async function() {
+            const emailExists = await mongodb.modelAuthAdmin.findOne({ email: { $eq: email } });
+            return emailExists != null && email == emailExists.email;
+        })();
 
         if (passCond && emailCond) {
             statusAction = true;
-            // TODO: Save new admin account
+            
+            // Save new admin account in MongoDB
+            const obj: mongodb.AdminSchema = {
+                name,
+                email,
+                password: passwordToCheckByHash(password) 
+            };
+            await mongodb.modelAdmin.create(obj);
         }
 
         return { action: "signup", success: statusAction };
