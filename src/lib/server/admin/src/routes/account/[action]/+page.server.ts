@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import * as mongodb from "../../../../../databases/mogodb";
+import * as session from "$lib/session";
 
 export const load = ({ locals, params }) => {
     return {
@@ -14,20 +15,20 @@ function passwordToCheckByHash(password: string) {
 }
 
 export const actions = {
-    signin: async ({ request }) => {
+    signin: async ({ request, cookies, locals }) => {
         let statusAction = false;
         
         const data = await request.formData();
         const [email, password] = [data.get("email") as string, data.get("password") as string];
-        console.log(mongodb)
         
         // Conditions
-        const passwordToCheckExistance = passwordToCheckByHash(password); // TODO: use it
-        const userExistsWithAllParams = true; // TODO: Check whether user exists in database
+        const userExistsWithAllParams = await mongodb.modelAdmin.exists({ email, password: passwordToCheckByHash(password) });
 
         if (userExistsWithAllParams) {
             statusAction = true;
-            // TODO: Set login session cookie
+            
+            // Set login session cookie (for server and client)
+            new session.SessionWrite(cookies, locals);
         }
 
         return { action: "signin", success: statusAction };
@@ -39,7 +40,7 @@ export const actions = {
         const [name, email, password] = [data.get("name") as string, data.get("email") as string, data.get("password") as string];
     
         // Conditions
-        const passCond = password?.length >= 8 && password?.length <= 20 && password.match(/\d/gi)?.length && password.match(/[A-Z]/g)?.length && password.match(/a-z/g)?.length && password.match(/\W/g)?.length;
+        const passCond = password?.length >= 8 && password?.length <= 20 && password.match(/\d/gi)?.length && password.match(/[A-Z]/g)?.length && password.match(/[a-z]/g)?.length && password.match(/\W/g)?.length ? true : false;
         const emailCond = await (async function() {
             const emailExists = await mongodb.modelAuthAdmin.findOne({ email: { $eq: email } });
             return emailExists != null && email == emailExists.email;
@@ -47,7 +48,7 @@ export const actions = {
 
         if (passCond && emailCond) {
             statusAction = true;
-            
+
             // Save new admin account in MongoDB
             const obj: mongodb.AdminSchema = {
                 name,

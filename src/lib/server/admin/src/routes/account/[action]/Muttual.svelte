@@ -57,7 +57,7 @@
             <input name="password" type="password" placeholder="Password" bind:value={password} on:paste={stopPaste}>
         {:else if dt.for == "signup"}
             <input name="name" type="text" placeholder="Name" bind:value={name}/>
-            <input name="email" type="email" placeholder="Email" bind:value={email} on:paste={stopPaste}/>
+            <input name="email" type="email" placeholder="Email" bind:value={email}/>
             <input name="password" type="password" placeholder="Password" bind:value={password} on:paste={stopPaste}>
             <input type="password" placeholder="Password Check" bind:value={passwordCheck} on:paste={stopPaste}/>
         {/if}
