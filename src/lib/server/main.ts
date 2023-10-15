@@ -140,7 +140,8 @@ function makeServer() {
             if (socket.data.isRealAdmin) {
                 const chatsFind = await mongodb.model.aggregate([
                     { $match: { id: { $exists: true } } },
-                    { $project: { _id: false, name: "$name", messages: "$messages", id: "$id", creation_date: "$creation_date" } }
+                    { $project: { _id: false, name: "$name", messages: "$messages", id: "$id", creation_date: "$creation_date" } },
+                    { $sort: { creation_date: -1 } }
                 ]) || [];
                 cb(true, chatsFind);
             }

@@ -29,6 +29,7 @@
 </script>
 
 <div>
+    <h1>Admin Panel</h1>
     <div class="chats">
         {#each chats as chat}
             <button id="chat" on:click={goToChat}>
