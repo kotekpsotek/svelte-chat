@@ -17,10 +17,42 @@ function makeServer() {
     const http_server = createServer();
     const socket_server = new Server(http_server, {
         cors: {
-            origin: "*",
+            origin: "http://localhost:5555",
             credentials: true
         }
     });
+
+    /** @description Check admin is admin for **admin actions** */
+    socket_server.use(async (socket, nxt) => {
+        // Parse cookie
+        function parseCookie() {
+            const ready = new Map<string, string>();
+
+            if (socket.request.headers.cookie) {
+                const differentCookies = socket.request.headers.cookie.split(";");
+                for (const cookie of differentCookies) {
+                    const [name, val] = cookie.split("=");
+                    ready.set(name, val);
+                }
+            }
+
+            return ready;
+        }
+
+        // Cookies
+        const cookies = parseCookie();
+        const sessCookie = cookies.get("sess");
+
+        // Check user admin is realy admin
+        if (sessCookie) {
+            // Check in database
+            if (await mongodb.modelAuthAdmin.exists({ sess_id: { $eq: sessCookie }, date_set: { $gt: new Date() } })) {
+                socket.data.isRealAdmin = true;
+            }
+        }
+
+        nxt();
+    })
     
     socket_server.on("connect", (socket) => {
         const conditionInteractionWithChat = (chatId: string, userId: string) => {

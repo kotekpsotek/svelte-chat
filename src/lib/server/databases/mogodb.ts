@@ -48,6 +48,18 @@ const authAdminSchema = new Schema<AuthAdminsEmailsSchema>({
     email: { type: String, required: true }
 });
 
+interface AdminCookie {
+    sess_id: string,
+    date_set?: Date
+    expiration_date: Date
+}
+
+const sessionAdminSchema = new Schema<AdminCookie>({
+    sess_id: { type: String, required: true },
+    date_set: { type: Date, default: () => new Date() },
+    expiration_date: { type: Date, required: true }
+});
+
 /** Make connection and model for mongodb */
 function makeConnectionAndModel() {
     const connection = mongoose.createConnection("mongodb://localhost:27017", {
@@ -56,10 +68,11 @@ function makeConnectionAndModel() {
     const modelChats = connection.model("svelte-chats", chatSchema, "sv-chats-collection");
     const modelAdmin = connection.model("admin", adminSchema);
     const modelAuthAdmin = connection.model("admin_auth", authAdminSchema);
-
-    return { connection, model: modelChats, modelAdmin, modelAuthAdmin };
+    const sessionAdminCookiesModel = connection.model("admin_sessions", sessionAdminSchema);
+    
+    return { connection, model: modelChats, modelAdmin, modelAuthAdmin, sessionAdminCookiesModel };
 }
 
-export const { model, connection, modelAdmin, modelAuthAdmin } = makeConnectionAndModel()
+export const { model, connection, modelAdmin, modelAuthAdmin, sessionAdminCookiesModel } = makeConnectionAndModel()
 export { chatSchema, adminSchema, authAdminSchema };
 export type { ChatSchema, AdminSchema, AuthAdminsEmailsSchema };
