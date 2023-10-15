@@ -1,15 +1,19 @@
 <script lang="ts">
     import { Socket, io } from "socket.io-client";
-    import { ChatOperational } from "carbon-icons-svelte"
+    import { ChatOperational, ProgressBarRound } from "carbon-icons-svelte"
     import { onMount } from "svelte";
     import ChatDetermined from "./ChatDetermined.svelte";
     
     let connection: Socket;
     let chats: AdminPreviewForChat[] = [];
+
+    let loading: boolean = true;
     
     function goToChat() {
+        loading = true;
         connection.emit("get-admin-chats", (success: boolean, chatsPayload: AdminPreviewForChat[]) => {
             chats = chatsPayload;
+            loading = false;
         });
     }
 
@@ -36,12 +40,29 @@
 <div class="panel">
     <h1>Admin Panel</h1>
     <div class="chats">
-        {#each chats as chat}
-            <button id="chat" on:click={openChat(chat)}>
-                <ChatOperational size={24}/>
-                <p>{chat.name ? chat.name : new Date(chat.creation_date).toLocaleString()}</p>
-            </button>
-        {/each}
+        {#if !loading}
+            {#if chats.length}
+                {#each chats as chat}
+                    <button id="chat" on:click={openChat(chat)}>
+                        <ChatOperational size={24}/>
+                        <p>{chat.name ? chat.name : new Date(chat.creation_date).toLocaleString()}</p>
+                    </button>
+                {/each}
+            {:else}
+                <div class="no-chats">
+                    <p>No chats, No worry 🕳️!</p>
+                </div>
+            {/if}
+        {:else}
+            <div class="loading">
+                <div>
+                    <div id="animation">
+                        <ProgressBarRound size={32}/>
+                    </div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -78,5 +99,45 @@
 
     .chats #chat:last-of-type {
         border-bottom: none;
+    }
+
+    .no-chats {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        font-weight: 700;
+    }
+
+    .loading {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+    }
+
+    .loading > div:first-of-type {
+        display: flex;
+        column-gap: 10px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #animation {
+        animation: rotate 300ms linear forwards infinite;
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>

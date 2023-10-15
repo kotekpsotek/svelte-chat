@@ -7,6 +7,12 @@
     export let chat: AdminPreviewForChat;
 
     const dsp = createEventDispatcher();
+
+    onMount(() => {
+        connection.emit("admin-join-to-chat", chat.id, (success: boolean) => {
+            if (!success) alert("Cannot join to chat (Try leave it and join again)")
+        });
+    });
 </script>
 
 <div class="chat-opened">

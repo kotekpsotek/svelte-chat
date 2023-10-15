@@ -145,7 +145,15 @@ function makeServer() {
                 cb(true, chatsFind);
             }
             else cb(false, [])
-        })
+        });
+
+        socket.on("admin-join-to-chat", (chat_id: string, cb: (success: boolean) => void) => {
+            if (socket.data.isRealAdmin) {
+                socket.join(chat_id);
+                cb(true);
+            }
+            else cb(false);
+        });
     })
     
     http_server.listen(10501)
