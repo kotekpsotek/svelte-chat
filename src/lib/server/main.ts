@@ -46,7 +46,7 @@ function makeServer() {
         // Check user admin is realy admin
         if (sessCookie) {
             // Check in database
-            if (await mongodb.modelAuthAdmin.exists({ sess_id: { $eq: sessCookie }, date_set: { $gt: new Date() } })) {
+            if (await mongodb.sessionAdminCookiesModel.exists({ sess_id: { $eq: sessCookie }, expiration_date: { $gt: new Date() } })) {
                 socket.data.isRealAdmin = true;
             }
         }
@@ -133,6 +133,19 @@ function makeServer() {
                 cb(false, undefined)
             }
         });
+
+        // Admin actions
+        socket.on("get-admin-chats", async (cb: (success: boolean, chat: { name: string, messages: { content: string, user_id: string, date: Date }[], id: string, creation_date: string }[]) => void) => {
+            console.log(socket.data.isRealAdmin)
+            if (socket.data.isRealAdmin) {
+                const chatsFind = await mongodb.model.aggregate([
+                    { $match: { id: { $exists: true } } },
+                    { $project: { _id: false, name: "$name", messages: "$messages", id: "$id", creation_date: "$creation_date" } }
+                ]) || [];
+                cb(true, chatsFind);
+            }
+            else cb(false, [])
+        })
     })
     
     http_server.listen(10501)

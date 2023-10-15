@@ -1,29 +1,40 @@
 <script lang="ts">
-    import { io } from "socket.io-client";
+    import { Socket, io } from "socket.io-client";
+    import { ChatOperational } from "carbon-icons-svelte"
+    import { onMount } from "svelte";
     
-    const connection = io("http://localhost:10501", {
-        withCredentials: true
-    });
+    let connection: Socket;
 
     interface AdminPreviewForChat {
         name: string,
-        messages: any[],
+        messages: { content: string, user_id: string, date: Date }[],
         id: string,
         creation_date: Date
     }
 
     let chats: AdminPreviewForChat[] = [];
-    async function goToChat() {
-        connection.emit("get-admin-chats", (chatsPayload: AdminPreviewForChat[]) => {
+    
+    function goToChat() {
+        connection.emit("get-admin-chats", (success: boolean, chatsPayload: AdminPreviewForChat[]) => {
             chats = chatsPayload;
         });
     }
+
+    onMount(() => {
+        connection = io("http://localhost:10501", {
+            withCredentials: true
+        });
+        setTimeout(goToChat, 1_000)
+    })
 </script>
 
 <div>
     <div class="chats">
-        <button id="chat" on:click={goToChat}>
-
-        </button>
+        {#each chats as chat}
+            <button id="chat" on:click={goToChat}>
+                <ChatOperational size={24}/>
+                <p>{chat.name ? chat.name : new Date(chat.creation_date).toLocaleString()}</p>
+            </button>
+        {/each}
     </div>
 </div>
