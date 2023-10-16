@@ -63,7 +63,7 @@
         const chatIcon = document.getElementById("c-ico");
         const cIW = chatIcon!.clientWidth;
 
-        node.style.width = document.body.clientWidth - (cIW + 15) + "px";
+        node.style.width = document.body.clientWidth + "px" /* - (cIW + 15) + "px" */;
         
         return {};
     }
@@ -301,24 +301,6 @@
     .upper h1 {
         font-size: 25px;
         font-weight: 600;
-    }
-
-    .upper button.go-back {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        filter: brightness(0.5);
-        transition: all linear 100ms;
-        margin-right: 10px;
-    }
-
-    .upper button.go-back:hover {
-        background-color: rgb(35, 35, 35);
-        filter: brightness(1.0);
-        box-shadow: 0px 0px 10px rgb(85, 85, 85);
     }
 
     main.chats-list {

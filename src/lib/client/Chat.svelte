@@ -2,6 +2,7 @@
     import { Close, Return, SendFilled } from "carbon-icons-svelte";
     import { onMount, createEventDispatcher } from "svelte";
     import type { Socket } from "socket.io-client";
+    import "./styles.css";
 
     export let userId: string;
     export let chat: Chat;
@@ -22,10 +23,14 @@
     let messageChatContent: string = "";
     function sendNewMessage() {
         if (messageChatContent.length) {
+            const messagesContainer = document.getElementsByClassName("messages-markup")[0];
             connection?.emit("new-message", userId, chat.id, messageChatContent, (success: boolean, message: typeof chat.messages[0] | undefined) => {
                 if (success && message) {
                     chat.messages = [...chat.messages, message];
                     messageChatContent = "";
+                    setTimeout(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    })
                 }
                 else alert("Couldn't send message. Please try again!");
             });
@@ -33,6 +38,10 @@
     }
 
     onMount(() => {
+        const messagesContainer = document.getElementsByClassName("messages-markup")[0];
+
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
         // Send message when user has got focus on input to pass new message content
         window.addEventListener("keypress", ({ code }) => {
             if (code == "Enter") sendNewMessage();
@@ -41,6 +50,9 @@
         // Capture new messages from other "client" in room
         connection?.on("capture-new-message", (newMessage: typeof chat.messages[0]) => {
             chat.messages = [...chat.messages, newMessage];
+            setTimeout(() => {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            })
         });
     })
 </script>
@@ -48,7 +60,7 @@
 <div class="upper">
     <!-- Close chat element -->
     <button class="go-back" on:click={_ => dsp("hide-chat-messages")}>
-        <Return size={24}/>
+        <Return size={24} fill="black"/>
     </button>
     <h1>Chat conversation ({chat.name.length ? chat.name : "No Name"})</h1>
     <button id="close-chat" on:click={_ => dsp("close-chat")}>
@@ -80,6 +92,11 @@
 </main>
 
 <style>
+    button {
+        border-radius: 0px;
+        border: none;
+    }
+    
     main.messages {
         width: 100%;
         height: calc(100% - 55px);
@@ -216,6 +233,25 @@
         filter: brightness(0.5);
         transition: all linear 100ms;
         margin-right: 10px;
+    }
+
+    .upper button.go-back:hover {
+        background-color: rgb(35, 35, 35);
+        filter: brightness(1.0);
+        box-shadow: 0px 0px 10px rgb(85, 85, 85);
+    }
+
+    .upper button.go-back {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        filter: brightness(0.5);
+        transition: all linear 100ms;
+        margin-right: 10px;
+        background-color: #EFEFEF;
     }
 
     .upper button.go-back:hover {
