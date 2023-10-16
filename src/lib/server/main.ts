@@ -94,7 +94,7 @@ function makeServer() {
         });
 
         socket.on("join-to-chat", async (chatId: string, userId: string) => {
-            if (await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before join hsi present to this chat room" })) {
+            if (socket.data.isRealAdmin || await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before join hsi present to this chat room" })) {
                 socket.join(chatId);
             }
         });

@@ -10,6 +10,7 @@
     let chats: ChatType[] = [];
 
     let loading: boolean = true;
+    let adminEmail: string;
     
     function goToChat() {
         loading = true;
@@ -24,11 +25,11 @@
     function openChat(chat: ChatType) {
         return () => {
             chatOpened = true;
+            connection.emit("join-to-chat", chat.id, adminEmail);
             chatG = chat;
         }
     }
 
-    let adminEmail: string;
     onMount(() => {
         connection = io("http://localhost:10501", {
             withCredentials: true
