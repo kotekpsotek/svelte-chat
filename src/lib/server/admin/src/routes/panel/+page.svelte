@@ -3,32 +3,33 @@
     import { ChatOperational, ProgressBarRound } from "carbon-icons-svelte"
     import { onMount } from "svelte";
     import ChatDetermined from "./ChatDetermined.svelte";
+    import ChatComp from "../../../../../client/Chat.svelte"
+    import Chat from "../../../../../client/Chat.svelte";
+    import type { Chat as ChatType } from "../../../../../../types";
     
     let connection: Socket;
-    let chats: AdminPreviewForChat[] = [];
+    let chats: ChatType[] = [];
 
     let loading: boolean = true;
     
     function goToChat() {
         loading = true;
-        connection.emit("get-admin-chats", (success: boolean, chatsPayload: AdminPreviewForChat[]) => {
+        connection.emit("get-admin-chats", (success: boolean, chatsPayload: ChatType[]) => {
             chats = chatsPayload;
             loading = false;
         });
     }
 
-    function openChat(chat: AdminPreviewForChat) {
+    let chatOpened = false;
+    let chatG: Partial<ChatType> = {};
+    function openChat(chat: ChatType) {
         return () => {
-            const chatOpened = new ChatDetermined({
-                target: document.body,
-                props: {
-                    connection,
-                    chat
-                }
-            })
+            chatOpened = true;
+            chatG = chat;
         }
     }
 
+    let userId: string; // TODO: Assign userID
     onMount(() => {
         connection = io("http://localhost:10501", {
             withCredentials: true
@@ -37,34 +38,39 @@
     })
 </script>
 
-<div class="panel">
-    <h1>Admin Panel</h1>
-    <div class="chats">
-        {#if !loading}
-            {#if chats.length}
-                {#each chats as chat}
-                    <button id="chat" on:click={openChat(chat)}>
-                        <ChatOperational size={24}/>
-                        <p>{chat.name ? chat.name : new Date(chat.creation_date).toLocaleString()}</p>
-                    </button>
-                {/each}
+
+{#if !chatOpened}
+    <div class="panel">
+        <h1>Admin Panel</h1>
+        <div class="chats">
+            {#if !loading}
+                {#if chats.length}
+                    {#each chats as chat}
+                        <button id="chat" on:click={openChat(chat)}>
+                            <ChatOperational size={24}/>
+                            <p>{chat.name ? chat.name : new Date(chat.creation_date).toLocaleString()}</p>
+                        </button>
+                    {/each}
+                {:else}
+                    <div class="no-chats">
+                        <p>No chats, No worry 🕳️!</p>
+                    </div>
+                {/if}
             {:else}
-                <div class="no-chats">
-                    <p>No chats, No worry 🕳️!</p>
+                <div class="loading">
+                    <div>
+                        <div id="animation">
+                            <ProgressBarRound size={32}/>
+                        </div>
+                        <p>Loading...</p>
+                    </div>
                 </div>
             {/if}
-        {:else}
-            <div class="loading">
-                <div>
-                    <div id="animation">
-                        <ProgressBarRound size={32}/>
-                    </div>
-                    <p>Loading...</p>
-                </div>
-            </div>
-        {/if}
+        </div>
     </div>
-</div>
+{:else}
+    <ChatComp {connection} chat={chatG} {userId} on:close-chat={_ => chatOpened = false} on:hide-chat-messages={_ => chatOpened = false}/>
+{/if}
 
 <style>
     .panel {

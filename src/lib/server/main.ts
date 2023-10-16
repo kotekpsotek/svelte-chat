@@ -17,7 +17,7 @@ function makeServer() {
     const http_server = createServer();
     const socket_server = new Server(http_server, {
         cors: {
-            origin: "http://localhost:5555",
+            origin: ["http://localhost:5555", "http://localhost:5173"],
             credentials: true
         }
     });
