@@ -6,6 +6,7 @@ interface ChatSchema {
     name?: string,
     messages: {
         content: string
+        /** Under this field is common user uuid v4 identifier or admin email */
         user_id: string,
         date: Date // Date can be also uuid
     }[],
@@ -51,13 +52,15 @@ const authAdminSchema = new Schema<AuthAdminsEmailsSchema>({
 interface AdminCookie {
     sess_id: string,
     date_set?: Date
-    expiration_date: Date
+    expiration_date: Date,
+    email: string
 }
 
 const sessionAdminSchema = new Schema<AdminCookie>({
     sess_id: { type: String, required: true },
     date_set: { type: Date, default: () => new Date() },
-    expiration_date: { type: Date, required: true }
+    expiration_date: { type: Date, required: true },
+    email: { type: String, required: true }
 });
 
 /** Make connection and model for mongodb */

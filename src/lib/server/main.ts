@@ -46,8 +46,10 @@ function makeServer() {
         // Check user admin is realy admin
         if (sessCookie) {
             // Check in database
-            if (await mongodb.sessionAdminCookiesModel.exists({ sess_id: { $eq: sessCookie }, expiration_date: { $gt: new Date() } })) {
+            const sesCookie = await mongodb.sessionAdminCookiesModel.findOne({ sess_id: { $eq: sessCookie }, expiration_date: { $gt: new Date() } })
+            if (sesCookie) {
                 socket.data.isRealAdmin = true;
+                socket.data.admin_email = sesCookie.email;
             }
         }
 
@@ -105,16 +107,16 @@ function makeServer() {
 
         socket.on("new-message", async (userId: string, chatId: string, messageContent: string, cb: (success: boolean, message: Record<string, any> | undefined) => void) => {
             try {
-                if (await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before add his message to it" })) {
+                if (socket.data.isRealAdmin || await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before add his message to it" })) {
                     // Compose new message
                     const new_message: mongodb.ChatSchema["messages"][0] = {
-                        user_id: userId,
+                        user_id: !socket.data.isRealAdmin ? userId : socket.data.admin_email,
                         content: messageContent,
                         date: new Date()
                     };
     
                     // Pass new message to database
-                    const updated = await mongodb.model.findOneAndUpdate(conditionInteractionWithChat(chatId, userId), {
+                    const updated = await mongodb.model.findOneAndUpdate(socket.data.isRealAdmin ? { id: chatId } : conditionInteractionWithChat(chatId, userId), {
                         $push: {
                             messages: new_message
                         }
@@ -154,6 +156,14 @@ function makeServer() {
             }
             else cb(false);
         });
+
+        socket.on("admin-get-email", (cb: (email: string | undefined) => void) => {
+            let email: string | undefined = undefined;
+            if (socket.data.isRealAdmin) {
+                email = socket.data.admin_email;
+            }
+            cb(email);
+        })
     })
     
     http_server.listen(10501)

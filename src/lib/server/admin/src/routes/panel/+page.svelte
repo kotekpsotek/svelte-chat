@@ -4,7 +4,6 @@
     import { onMount } from "svelte";
     import ChatDetermined from "./ChatDetermined.svelte";
     import ChatComp from "../../../../../client/Chat.svelte"
-    import Chat from "../../../../../client/Chat.svelte";
     import type { Chat as ChatType } from "../../../../../../types";
     
     let connection: Socket;
@@ -29,11 +28,19 @@
         }
     }
 
-    let userId: string; // TODO: Assign userID
+    let adminEmail: string;
     onMount(() => {
         connection = io("http://localhost:10501", {
             withCredentials: true
         });
+
+        connection.emit("admin-get-email", (email: string | undefined) => {
+            if (!email) {
+                alert("you probably isn't logged in")
+            } 
+            else adminEmail = email;
+        })
+        
         setTimeout(goToChat, 1_000)
     })
 </script>
@@ -69,7 +76,7 @@
         </div>
     </div>
 {:else}
-    <ChatComp {connection} chat={chatG} {userId} on:close-chat={_ => chatOpened = false} on:hide-chat-messages={_ => chatOpened = false}/>
+    <ChatComp {connection} chat={chatG} userId={adminEmail} on:close-chat={_ => chatOpened = false} on:hide-chat-messages={_ => chatOpened = false}/>
 {/if}
 
 <style>

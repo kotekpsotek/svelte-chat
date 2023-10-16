@@ -37,7 +37,7 @@ export const actions = {
             statusAction = true;
             
             // Set login session cookie (for server and client)
-            new session.SessionWrite(cookies, locals);
+            new session.SessionWrite(cookies, locals, email);
         }
 
         return { action: "signin", success: statusAction };

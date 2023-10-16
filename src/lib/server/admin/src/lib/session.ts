@@ -10,14 +10,15 @@ export class SessionDestroy {
 }
 
 export class SessionWrite extends SessionDestroy {
-    constructor(cookies: Cookies, locals: App.Locals) {
+    constructor(cookies: Cookies, locals: App.Locals, email: string) {
         const sessionId = randomUUID();
         const expDate = new Date(Date.now() + (24 * 60 * 60 * 1_000));
         
         // Save in databse
         mongodb.sessionAdminCookiesModel.create({
             sess_id: sessionId,
-            expiration_date: expDate
+            expiration_date: expDate,
+            email
         })
 
         // For client
