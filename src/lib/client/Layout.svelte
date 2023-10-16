@@ -1,35 +1,20 @@
 <script lang="ts">
-    import { Chat, ChatLaunch, Return, AddComment, Add, Close, SendFilled } from "carbon-icons-svelte";
-    import { io , type Socket} from "socket.io-client";
+    import { ChatLaunch, Return, AddComment, Add, Close, SendFilled, Chat as ChatIco } from "carbon-icons-svelte";
+    import { io, type Socket} from "socket.io-client";
     import { onMount } from "svelte";
     import connection from "./connection.js";
     import ChatPrompt from "./ChatPrompt.svelte";
+    import ChatComp from "$lib/client/Chat.svelte"
 
     let chatStateShow = false;
     let conversationShowState = false;
 
     let myId = "1"
     let chatsList: Record<string, any>[] = []
-    let chat = {
+    let chat: Chat = {
         id: "",
         name: "",
-        messages: [
-            {
-                user_id: "1",
-                content: "Message 1",
-                date: Date.now()
-            },
-            {
-                user_id: "2",
-                content: "Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2Message 2".replaceAll(" ", ""),
-                date: Date.now()
-            },
-            {
-                user_id: "1",
-                content: "Message 1",
-                date: Date.now()
-            },
-        ],
+        messages: [],
         creation_date: new Date()
     }
 
@@ -116,28 +101,6 @@
         chat = Object.create(null);
     }
 
-    /** Manage focus on input to pass new message content */
-    let focusOnMessageInput = false;
-    function focusMessageInput(state: boolean) {
-        return () => {
-            focusOnMessageInput = state;
-        }
-    }
-    
-    /** Send new message */
-    let messageChatContent: string = "";
-    function sendNewMessage() {
-        if (messageChatContent.length) {
-            $connection?.emit("new-message", myId, chat.id, messageChatContent, (success: boolean, message: typeof chat.messages[0] | undefined) => {
-                if (success && message) {
-                    chat.messages = [...chat.messages, message];
-                    messageChatContent = "";
-                }
-                else alert("Couldn't send message. Please try again!");
-            });
-        }
-    }
-
     onMount(() => {
         $connection = io("http://localhost:10501");
         const getId = (() => {
@@ -165,41 +128,24 @@
         window.addEventListener("resize", () => {
             // Change size for <section class="chat"> element
             spawnChatSection(document.querySelector('section.chat')!)
-        })
-
-        // Send message when user has got focus on input to pass new message content
-        window.addEventListener("keypress", ({ code }) => {
-            if (code == "Enter") sendNewMessage();
-        });
-
-        // Capture new messages from other "client" in room
-        $connection.on("capture-new-message", (newMessage: typeof chat.messages[0]) => {
-            chat.messages = [...chat.messages, newMessage];
         });
     })
 </script>
 
 <button class="chat-action" id="c-ico" on:click={loadChat}>
-    <Chat size={32} fill="white"/>
+    <ChatIco size={32} fill="white"/>
 </button>
 {#if chatStateShow}
     <!-- TODO: 1. List of stated prior chats by date, 2. Chat messages, 3. Ability to send new message -->
     <section class="chat" use:spawnChatSection>
-        <div class="upper">
-            <!-- Close chat element -->
-            {#if !conversationShowState}
-                <h1>Chats list</h1>
-            {:else}
-                <button class="go-back" on:click={showOrHideChatMessages(undefined)}>
-                    <Return size={24}/>
-                </button>
-                <h1>Chat conversation ({chat.name.length ? chat.name : "No Name"})</h1>
-            {/if}
-            <button id="close-chat" on:click={closeChat}>
-                <Close size={32} fill="white"/>
-            </button>
-        </div>
         {#if !conversationShowState}
+            <div class="upper">
+                <!-- Close chat element -->
+                <h1>Chats list</h1>
+                <button id="close-chat" on:click={closeChat}>
+                    <Close size={32} fill="white"/>
+                </button>
+            </div>
             <main class="chats-list">
                 <!-- Chats list -->
                 {#if chatsList.length}
@@ -224,36 +170,8 @@
                 </button>
             </div>
         {:else}
-            <main class="messages">
-                {#if chat.messages.length}
-                    <div class="messages-markup">
-                        {#each chat.messages as message}
-                            <div class="c" class:my={message.user_id == myId}>
-                                <div>
-                                    <p>{message.content}</p>
-                                </div>
-                            </div>
-                        {/each}
-                    </div>
-                {:else}
-                    <div class="no-messages">
-                        <p>💬 Chat is empty. Let's fill it 📟!</p>
-                    </div>
-                {/if}
-                <div class="write-message">
-                    <input type="text" placeholder="Message..." bind:value={messageChatContent} on:focus={focusMessageInput(true)} on:blur={focusMessageInput(false)}>
-                    <button title="send" on:click={sendNewMessage}>
-                        <SendFilled size={24} fill="white"/>
-                    </button>
-                </div>
-            </main>
+            <ChatComp userId={myId} chat={chat} connection={$connection} on:close-chat={closeChat} on:hide-chat-messages={showOrHideChatMessages(undefined)}/>
         {/if}
-       <!--  <div class="msg">
-            <input type="text" bind:value={newMessageContent}>
-            <button on:click={sendNewMessage}>
-                Send
-            </button>
-        </div> -->
     </section>
 {/if}
 
@@ -408,95 +326,5 @@
         width: 100%;
         height: calc(100% - 55px);
         /* padding: 5px; */
-    }
-
-    main.messages {
-        width: 100%;
-        height: calc(100% - 55px);
-        /* padding: 5px; */
-        display: flex;
-        flex-direction: column;
-        row-gap: 1px;
-    }
-
-    main.messages div.c {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-    }
-
-    main.messages div.c.my {
-        justify-content: flex-end;
-    }
-
-    main.messages div.c div {
-        width: fit-content;
-        max-width: 49%;
-        background-color: blue;
-        color: white;
-        border-radius: 15px;
-        padding: 5px;
-    }
-
-    main.messages div.c.my div {
-        background-color: black;
-    }
-
-    main.messages div.c div p {
-        text-wrap: balance;
-        word-wrap: break-word;
-    }
-
-    main.messages .no-messages {
-        width: 100%;
-        height: calc(100% - 80px);
-        display: flex;
-        justify-content: center;
-        padding: 5px;
-        color: grey;
-    }
-
-    main.messages .messages-markup {
-        box-sizing: border-box;
-        width: 100%;
-        height: calc(100% - 80px);
-        display: flex;
-        flex-direction: column;
-        row-gap: 2px;
-        padding: 5px;
-        overflow-y: auto;
-    }
-
-    main.messages .write-message {
-        height: 80px;
-        display: flex;
-        align-items: center;
-        background-color: whitesmoke;
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-
-    main.messages .write-message input {
-        width: 95%;
-        height: 50%;
-        padding-left: 5px;
-        padding-right: 5px;
-        border: solid 1px grey;
-        border-right: none;
-        border-radius: 5px;
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;
-        outline: none;
-    }
-
-    main.messages .write-message button {
-        width: 5%;
-        height: 52%;
-        border: 1px grey solid;
-        border-left: none;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
-        background-color: black;
-        cursor: pointer;
     }
 </style>
