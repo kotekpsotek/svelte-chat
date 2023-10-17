@@ -15,7 +15,7 @@
     }
 
     onMount(() => {
-        if (temporary) {
+        if (temporaryMs) {
             setTimeout(() => {
                 alertElement.remove();
             }, temporaryMs)

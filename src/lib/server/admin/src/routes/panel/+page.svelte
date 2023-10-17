@@ -37,14 +37,6 @@
             withCredentials: true
         });
 
-        // const append = new AlertSvelte({
-        //     target: document.body,
-        //     props: {
-        //         type: "info",
-        //         message: "New message content New message content New message content New message content New message content New message content New message content"
-        //     }
-        // })
-
         connection.emit("admin-get-email", (email: string | undefined) => {
             if (!email) {
                 alert("you probably isn't logged in")
@@ -53,7 +45,14 @@
         });
 
         connection.on("admin-new-chat-arrived", (chat: ChatType) => {
-            alert(`New chat has arrived from user ${chat.user_creator}`);
+            const append = new AlertSvelte({
+                target: document.body,
+                props: {
+                    type: "info",
+                    message: `New chat had arrived from user ${chat.user_creator}`,
+                    temporaryMs: 15_000 // 15 seconds
+                }
+            })
             chats = [chat, ...chats];
         });
         
