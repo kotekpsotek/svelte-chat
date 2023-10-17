@@ -5,7 +5,7 @@
     import "./styles.css";
 
     export let userId: string;
-    export let chat: Chat;
+    export let chat: ChatType;
     export let connection: Socket | undefined;
 
     /** Events dispatcher */
@@ -29,7 +29,7 @@
                     chat.messages = [...chat.messages, message];
                     messageChatContent = "";
                     setTimeout(() => {
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        if (messagesContainer?.scrollHeight) messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     })
                 }
                 else alert("Couldn't send message. Please try again!");
@@ -40,7 +40,8 @@
     onMount(() => {
         const messagesContainer = document.getElementsByClassName("messages-markup")[0];
 
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        // Scroll down
+        if (messagesContainer?.scrollHeight) messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
         // Send message when user has got focus on input to pass new message content
         window.addEventListener("keypress", ({ code }) => {
@@ -51,7 +52,10 @@
         connection?.on("capture-new-message", (newMessage: typeof chat.messages[0]) => {
             chat.messages = [...chat.messages, newMessage];
             setTimeout(() => {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                // Scroll down
+                if (messagesContainer?.scrollHeight) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
             })
         });
     })
