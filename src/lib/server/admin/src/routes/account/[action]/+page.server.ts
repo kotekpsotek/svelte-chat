@@ -1,13 +1,16 @@
 import crypto from "crypto";
 import * as mongodb from "../../../../../databases/mogodb";
 import * as session from "$lib/session";
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 
-export const load = async ({ locals, params, cookies }) => {
+export const load = async ({ url, locals, params, cookies }) => {
     const cookieSes = session.SessionRead.getSessionId(cookies);
     console.log(cookieSes, await session.SessionRead.alreadyLoggedin(cookieSes!))
-    if (cookieSes && await session.SessionRead.alreadyLoggedin(cookieSes)) {
+    if (cookieSes && await session.SessionRead.alreadyLoggedin(cookieSes) && !url.searchParams.has("/signin")) {
         throw error(401, { message: "You're actually login" });
+    }
+    else if (cookieSes && await session.SessionRead.alreadyLoggedin(cookieSes) && url.searchParams.has("/signin")) {
+        throw redirect(301, "/panel?signin")
     }
     else {
         return {

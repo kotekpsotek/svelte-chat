@@ -40,6 +40,7 @@
 
         const url = new URL(document.URL);
         const redFrom = url.searchParams.get("red_from");
+        const justSignin = url.searchParams.has("signin");
 
         if (redFrom) {
             new Alert({
@@ -48,6 +49,16 @@
                     type: "info",
                     message: "You had been redirected to panel page. Before this alret close itself you should know that this route is only one appropriate to manage all chats as admin!",
                     temporaryMs: 20_000 // 20 seconds
+                }
+            })
+        }
+        else if (justSignin) {
+            new Alert({
+                target: document.body,
+                props: {
+                    type: "info",
+                    message: "You are signed-in. You had been signed-in moment ago",
+                    temporaryMs: 10_000 // 20 seconds
                 }
             })
         }
