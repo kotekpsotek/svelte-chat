@@ -6,6 +6,7 @@
     import ChatComp from "../../../../../client/Chat.svelte"
     import type { Chat as ChatType } from "../../../../../../types";
     import AlertSvelte from "../../../../../../lib/client/Alert.svelte"
+    import Alert from "../../../../../../lib/client/Alert.svelte";
     
     let connection: Socket;
     let chats: ChatType[] = [];
@@ -36,6 +37,20 @@
         connection = io("http://localhost:10501", {
             withCredentials: true
         });
+
+        const url = new URL(document.URL);
+        const redFrom = url.searchParams.get("red_from");
+
+        if (redFrom) {
+            new Alert({
+                target: document.body,
+                props: {
+                    type: "info",
+                    message: "You had been redirected to panel page. Before this alret close itself you should know that this route is only one appropriate to manage all chats as admin!",
+                    temporaryMs: 20_000 // 20 seconds
+                }
+            })
+        }
 
         connection.emit("admin-get-email", (email: string | undefined) => {
             if (!email) {
