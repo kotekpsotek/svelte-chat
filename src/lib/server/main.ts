@@ -60,6 +60,12 @@ function makeServer() {
         const conditionInteractionWithChat = (chatId: string, userId: string) => {
             return { $and: [{ id: { $eq: chatId } }, { $or: [{ user_creator: { $eq: userId } }, { "messages.user_id": { $eq: userId } }]}] }
         };
+
+        // Join admin to admin room
+        if (socket.data.isRealAdmin) {
+            socket.join("admin-room");
+            console.log("New admin arrived")
+        }
         
         socket.on("generate-my-id", (cb) => {
             cb(randomUUID());
@@ -84,7 +90,13 @@ function makeServer() {
             // Join user to chat room (by chat id)
             socket.join(created.id);
 
+            // Send feedback to client
             cb(created.id, created.creation_date, title, created.messages);
+
+            // Emit to admin event that new chat has been made
+            delete (created as any)._id;
+            delete created.__v;
+            socket.in("admin-room").emit("admin-new-chat-arrived", created);
         });
 
         socket.on("get-chats", async (userId: string, cb) => {
@@ -135,8 +147,7 @@ function makeServer() {
                 cb(false, undefined)
             }
         });
-
-        // Admin actions
+        
         socket.on("get-admin-chats", async (cb: (success: boolean, chat: { name: string, messages: { content: string, user_id: string, date: Date }[], id: string, creation_date: string }[]) => void) => {
             if (socket.data.isRealAdmin) {
                 const chatsFind = await mongodb.model.aggregate([
@@ -163,7 +174,7 @@ function makeServer() {
                 email = socket.data.admin_email;
             }
             cb(email);
-        })
+        });
     })
     
     http_server.listen(10501)

@@ -5,6 +5,7 @@
     import ChatDetermined from "./ChatDetermined.svelte";
     import ChatComp from "../../../../../client/Chat.svelte"
     import type { Chat as ChatType } from "../../../../../../types";
+    import AlertSvelte from "../../../../../../lib/client/Alert.svelte"
     
     let connection: Socket;
     let chats: ChatType[] = [];
@@ -20,6 +21,7 @@
         });
     }
 
+    
     let chatOpened = false;
     let chatG: Partial<ChatType> = {};
     function openChat(chat: ChatType) {
@@ -35,12 +37,25 @@
             withCredentials: true
         });
 
+        // const append = new AlertSvelte({
+        //     target: document.body,
+        //     props: {
+        //         type: "info",
+        //         message: "New message content New message content New message content New message content New message content New message content New message content"
+        //     }
+        // })
+
         connection.emit("admin-get-email", (email: string | undefined) => {
             if (!email) {
                 alert("you probably isn't logged in")
             } 
             else adminEmail = email;
-        })
+        });
+
+        connection.on("admin-new-chat-arrived", (chat: ChatType) => {
+            alert(`New chat has arrived from user ${chat.user_creator}`);
+            chats = [chat, ...chats];
+        });
         
         setTimeout(goToChat, 1_000)
     })
