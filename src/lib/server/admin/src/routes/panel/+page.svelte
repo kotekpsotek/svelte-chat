@@ -113,6 +113,29 @@
 
             chats = [chat, ...chats];
         });
+
+        // Capture admin terminate user chat
+        connection?.on("chat-terminated-by-admin", (chat_id: string) => {
+            // Close chat, only while user is in
+            if (chatG.id == chat_id) {
+                chatOpened = false;    
+            }
+
+            // Delete chat
+            const terminatedChatId = chats.findIndex(v => v.id == chat_id);
+            const deletedChat = chats.splice(terminatedChatId, 1);
+            chats = chats;
+
+            // Alert with information
+            const infoAlert = new Alert({
+                target: document.body,
+                props: {
+                    type: "info",
+                    message: `Case '${deletedChat[0].name}' which has been opened by you was terminated by other admin`,
+                    temporaryMs: 5_000 // 5 seconds
+                }
+            })
+        });
         
         setTimeout(goToChat, 1_000)
     })

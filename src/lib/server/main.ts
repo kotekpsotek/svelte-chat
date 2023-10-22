@@ -7,7 +7,7 @@ import express from "express";
 
 // Setup SvelteKit Admin app Handler for production
 process.env["ORIGIN"] = "http://localhost:10502";
-import { handler as svelteKitAdminApp } from "./admin/build/handler.js";
+// import { handler as svelteKitAdminApp } from "./admin/build/handler.js";
 
 // Databases
 import * as mongodb from "./databases/mogodb.js";
@@ -17,7 +17,7 @@ function makeServer() {
     const http_server = createServer();
     const socket_server = new Server(http_server, {
         cors: {
-            origin: ["http://localhost:5555", "http://localhost:5173", "http://localhost:5174"],
+            origin: ["http://localhost:5555", "http://localhost:10502", "http://localhost:5173", "http://localhost:5174"],
             credentials: true
         }
     });
@@ -182,6 +182,11 @@ function makeServer() {
 
                 if (chatDeleted) {
                     cb(true);
+
+                    // Emit to other user which made terminated case
+                    socket
+                        .in(chatId)
+                        .emit("chat-terminated-by-admin", chatId)
                 }
                 else cb(false)
             }
@@ -202,7 +207,7 @@ function makeAdminPanelRouting() {
     const app = express();
 
     // Let sveltekit application work
-    app.use(svelteKitAdminApp);
+    // app.use(svelteKitAdminApp);
 
     // Listen addmin app on specified port
     app.listen(PORT_ADMIN);

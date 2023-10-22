@@ -5,6 +5,7 @@
     import connection from "./connection.js";
     import ChatPrompt from "./ChatPrompt.svelte";
     import ChatComp from "$lib/client/Chat.svelte"
+    import Alert from "./Alert.svelte"
 
     let chatStateShow = false;
     let conversationShowState = false;
@@ -128,6 +129,29 @@
         window.addEventListener("resize", () => {
             // Change size for <section class="chat"> element
             spawnChatSection(document.querySelector('section.chat')!)
+        });
+
+        // Capture admin terminate user chat
+        $connection?.on("chat-terminated-by-admin", (chat_id: string) => {
+            // Close chat, only while user is in
+            if (chat.id == chat_id) {
+                conversationShowState = false;    
+            }
+
+            // Delete chat
+            const terminatedChatId = chatsList.findIndex(v => v.id == chat_id);
+            const deletedChat = chatsList.splice(terminatedChatId, 1);
+            chatsList = chatsList;
+
+            // Alert with information
+            const infoAlert = new Alert({
+                target: document.body,
+                props: {
+                    type: "info",
+                    message: `Case '${deletedChat[0].name}' which has been opened by you was terminated by admin`,
+                    temporaryMs: 5_000 // 5 seconds
+                }
+            })
         });
     })
 </script>
