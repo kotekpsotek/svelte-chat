@@ -49,6 +49,16 @@
         const deletedChat = chats.splice(chatPositionOnList, 1);
         chats = chats;
         onCloseChat();
+
+        // Success Alert
+        new AlertSvelte({
+            target: document.body,
+            props: {
+                type: "success",
+                message: `You deleted the chat with id '${deletedChat[0].id}'`,
+                temporaryMs: 5_000 // 5 seconds
+            }
+        });
     }
 
     onMount(() => {

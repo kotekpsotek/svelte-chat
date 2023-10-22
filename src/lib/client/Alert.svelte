@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { InformationFilled } from "carbon-icons-svelte";
+    import { InformationFilled, CheckmarkFilled, Misuse } from "carbon-icons-svelte";
     
-    export let type: "info" | "error"
+    export let type: "info" | "error" | "success"
     export let message: string;
     export let temporaryMs: number | undefined = undefined;
 
@@ -11,7 +11,16 @@
     let alertElement: AlertElement;
 
     function alertTitle() {
-        return type == "info" ? "Information" : "not specified (to do)";
+        switch(type) {
+            case "info":
+                return "Information";
+            case "success":
+                return "Success";
+            case "error":
+                return "Error";
+            default:
+                return "not specified (to do)"
+        }
     }
 
     onMount(() => {
@@ -23,11 +32,17 @@
     });
 </script>
 
-<div class="alert" class:info={type == "info"} class:error={type == "error"} bind:this={alertElement}>
+<div class="alert" class:info={type == "info"} class:error={type == "error"} class:success={type == "success"} bind:this={alertElement}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="ico" on:click={_ => alertElement.remove()}>
-        <InformationFilled size={25} fill={type == "info" ? "lightblue" : "black"}/>
+        {#if type == "info"}
+            <InformationFilled size={25} fill={type == "info" ? "lightblue" : "black"}/>
+        {:else if type == "success"}
+            <CheckmarkFilled size={25} fill="black"/>
+        {:else if type == "error"}
+            <Misuse size={25} fill="black"/>
+        {/if}
     </div>
     <div class="txt">
         <h2>{alertTitle()}</h2>
@@ -97,6 +112,10 @@
         border-color: rgb(193, 81, 81);
     }
 
+    .alert.success {
+        border-color: rgb(36, 183, 36);
+    }
+
     .alert.info .ico {
         background-color: rgb(63, 162, 161);
     }
@@ -105,11 +124,19 @@
         background-color: rgb(157, 16, 16);
     }
 
+    .alert.success .ico {
+        background-color: rgb(19, 168, 19);
+    }
+
     .alert.info h2 {
         color: lightblue;
     }
 
     .alert.error h2 {
         color: rgb(193, 81, 81);
+    }
+
+    .alert.success h2 {
+        color: rgb(36, 183, 36);
     }
 </style>
