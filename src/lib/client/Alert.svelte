@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { InformationFilled } from "carbon-icons-svelte";
     
-    export let type: "info"
+    export let type: "info" | "error"
     export let message: string;
     export let temporaryMs: number | undefined = undefined;
 
@@ -23,7 +23,7 @@
     });
 </script>
 
-<div class="alert" class:info={type == "info"} bind:this={alertElement}>
+<div class="alert" class:info={type == "info"} class:error={type == "error"} bind:this={alertElement}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="ico" on:click={_ => alertElement.remove()}>
@@ -93,11 +93,23 @@
         border-color: lightblue;
     }
 
+    .alert.error {
+        border-color: rgb(193, 81, 81);
+    }
+
     .alert.info .ico {
         background-color: rgb(63, 162, 161);
     }
 
+    .alert.error .ico {
+        background-color: rgb(157, 16, 16);
+    }
+
     .alert.info h2 {
         color: lightblue;
+    }
+
+    .alert.error h2 {
+        color: rgb(193, 81, 81);
     }
 </style>
