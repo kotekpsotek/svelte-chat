@@ -13,6 +13,7 @@
 
     let loading: boolean = true;
     let adminEmail: string;
+    let newChatId: string | undefined;
     
     function goToChat() {
         loading = true;
@@ -30,6 +31,15 @@
             chatOpened = true;
             connection.emit("join-to-chat", chat.id, adminEmail);
             chatG = chat;
+        }
+    }
+
+    function onCloseChat() {
+        chatOpened = false;
+
+        // Unmark last chat as new one
+        if (chatG.id == newChatId) {
+            newChatId = undefined;
         }
     }
 
@@ -78,7 +88,11 @@
                     message: `New chat had arrived from user ${chat.user_creator}`,
                     temporaryMs: 15_000 // 15 seconds
                 }
-            })
+            });
+
+            // Mark this chat as new one
+            newChatId = chat.id;
+
             chats = [chat, ...chats];
         });
         
@@ -94,7 +108,7 @@
             {#if !loading}
                 {#if chats.length}
                     {#each chats as chat}
-                        <button id="chat" on:click={openChat(chat)}>
+                        <button id="chat" class:new-chat={chat.id == newChatId} on:click={openChat(chat)}>
                             <ChatOperational size={24}/>
                             <p>{chat.name ? chat.name : new Date(chat.creation_date).toLocaleString()}</p>
                         </button>
@@ -117,7 +131,7 @@
         </div>
     </div>
 {:else}
-    <ChatComp {connection} chat={chatG} userId={adminEmail} on:close-chat={_ => chatOpened = false} on:hide-chat-messages={_ => chatOpened = false}/>
+    <ChatComp {connection} chat={chatG} userId={adminEmail} on:close-chat={onCloseChat} on:hide-chat-messages={onCloseChat}/>
 {/if}
 
 <style>
@@ -179,6 +193,11 @@
         column-gap: 10px;
         justify-content: center;
         align-items: center;
+    }
+
+    button.new-chat {
+        background-color: black !important;
+        color: white !important;
     }
 
     #animation {
