@@ -44,10 +44,11 @@
     }
 
     /** Remove chat deleted by admin from list */
-    function onRemoveChat({ detail: { id: chatId } }: CustomEvent<{ id: string }>) {
+    function onRemoveChat({ detail: chatId }: CustomEvent<string>) {
         const chatPositionOnList = chats.findIndex(v => v.id == chatId);
         const deletedChat = chats.splice(chatPositionOnList, 1);
         chats = chats;
+        onCloseChat();
     }
 
     onMount(() => {

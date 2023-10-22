@@ -47,7 +47,7 @@
 
     /* Terminate case by admin */
     function onAdminTerminateCase() {
-        connection?.emit("terminate-chat", (success: boolean) => {
+        connection?.emit("terminate-chat", chat.id, (success: boolean) => {
             if (success) {
                 // Remove currently open chat
                 dsp("remove-chat", chat.id);

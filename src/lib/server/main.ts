@@ -17,7 +17,7 @@ function makeServer() {
     const http_server = createServer();
     const socket_server = new Server(http_server, {
         cors: {
-            origin: ["http://localhost:5555", "http://localhost:5173"],
+            origin: ["http://localhost:5555", "http://localhost:5173", "http://localhost:5174"],
             credentials: true
         }
     });
@@ -174,6 +174,18 @@ function makeServer() {
                 email = socket.data.admin_email;
             }
             cb(email);
+        });
+
+        socket.on("terminate-chat", async (chatId: string, cb: (success: boolean) => void) => {
+            if (socket.data.isRealAdmin) {
+                const chatDeleted = await mongodb.model.findOneAndDelete({ id: { $eq: chatId } });
+
+                if (chatDeleted) {
+                    cb(true);
+                }
+                else cb(false)
+            }
+            else cb(false);
         });
     })
     
