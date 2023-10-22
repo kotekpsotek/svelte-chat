@@ -43,6 +43,13 @@
         }
     }
 
+    /** Remove chat deleted by admin from list */
+    function onRemoveChat({ detail: { id: chatId } }: CustomEvent<{ id: string }>) {
+        const chatPositionOnList = chats.findIndex(v => v.id == chatId);
+        const deletedChat = chats.splice(chatPositionOnList, 1);
+        chats = chats;
+    }
+
     onMount(() => {
         connection = io("http://localhost:10501", {
             withCredentials: true
@@ -131,7 +138,7 @@
         </div>
     </div>
 {:else}
-    <ChatComp {connection} chat={chatG} userId={adminEmail} on:close-chat={onCloseChat} on:hide-chat-messages={onCloseChat}/>
+    <ChatComp {connection} adminMode={true} chat={chatG} userId={adminEmail} on:close-chat={onCloseChat} on:hide-chat-messages={onCloseChat} on:remove-chat={onRemoveChat}/>
 {/if}
 
 <style>

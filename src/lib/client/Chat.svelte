@@ -1,12 +1,14 @@
 <script lang="ts">
-    import { Close, Return, SendFilled } from "carbon-icons-svelte";
+    import { Close, Return, SendFilled, IbmCloudHyperProtectCryptoServices } from "carbon-icons-svelte";
     import { onMount, createEventDispatcher } from "svelte";
     import type { Socket } from "socket.io-client";
+    import AlertSvelte from "../client/Alert.svelte";
     import "./styles.css";
 
     export let userId: string;
     export let chat: ChatType;
     export let connection: Socket | undefined;
+    export let adminMode: boolean = false;
 
     /** Events dispatcher */
     const dsp = createEventDispatcher();
@@ -35,6 +37,30 @@
                 else alert("Couldn't send message. Please try again!");
             });
         }
+    }
+
+    /* Open and close admin options */
+    let adminOptionsHasBeenOpened = false;
+    function onOpenCloseAdminOptions() {
+        adminOptionsHasBeenOpened = !adminOptionsHasBeenOpened
+    }
+
+    /* Terminate case by admin */
+    function onAdminTerminateCase() {
+        connection?.emit("terminate-chat", (success: boolean) => {
+            if (success) {
+                // Remove currently open chat
+                dsp("remove-chat", chat.id);
+            }
+            else new AlertSvelte({
+                target: document.body,
+                props: {
+                    type: "error",
+                    message: `You cannot terrminate chat`,
+                    temporaryMs: 5_000 // 5 seconds
+                }
+            });
+        })
     }
 
     onMount(() => {
@@ -72,24 +98,36 @@
     </button>
 </div>
 <main class="messages">
-    {#if chat.messages.length}
-        <div class="messages-markup">
-            {#each chat.messages as message}
-                <div class="c" class:my={message.user_id == userId}>
-                    <div>
-                        <p>{message.content}</p>
-                    </div>
-                </div>
-            {/each}
+    {#if adminOptionsHasBeenOpened}
+        <div class="admin-options">
+            <button id="terminate-case" on:click={onAdminTerminateCase}>Terminate Case</button>
+            <button id="close" on:click={onOpenCloseAdminOptions}>Close</button>
         </div>
     {:else}
-        <div class="no-messages">
-            <p>💬 Chat is empty. Let's fill it 📟!</p>
-        </div>
+        {#if chat.messages.length}
+            <div class="messages-markup">
+                {#each chat.messages as message}
+                    <div class="c" class:my={message.user_id == userId}>
+                        <div>
+                            <p>{message.content}</p>
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {:else}
+            <div class="no-messages">
+                <p>💬 Chat is empty. Let's fill it 📟!</p>
+            </div>
+        {/if}
     {/if}
-    <div class="write-message">
+    <div class="write-message" class:admin-mode={true}>
+        {#if adminMode}
+            <button class="admin-opt" on:click={onOpenCloseAdminOptions}>
+                <IbmCloudHyperProtectCryptoServices size={24} fill="white"/>
+            </button>
+        {/if}
         <input type="text" placeholder="Message..." bind:value={messageChatContent} on:focus={focusMessageInput(true)} on:blur={focusMessageInput(false)}>
-        <button title="send" on:click={sendNewMessage}>
+        <button class="send" title="send" on:click={sendNewMessage}>
             <SendFilled size={24} fill="white"/>
         </button>
     </div>
@@ -180,15 +218,29 @@
         outline: none;
     }
 
+    main.messages .write-message.admin-mode input {
+        border-left: none;
+        border-radius: 0%;
+    }
+
     main.messages .write-message button {
         width: 5%;
         height: 52%;
         border: 1px grey solid;
+        background-color: black;
+        cursor: pointer;
+    }
+
+    button.send {
         border-left: none;
         border-top-right-radius: 5px;
         border-bottom-right-radius: 5px;
-        background-color: black;
-        cursor: pointer;
+    }
+
+    button.admin-opt {
+        border-right: none;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
     }
 
     .upper {
@@ -262,5 +314,31 @@
         background-color: rgb(35, 35, 35);
         filter: brightness(1.0);
         box-shadow: 0px 0px 10px rgb(85, 85, 85);
+    }
+
+    .admin-options {
+        width: 100%;
+        height: calc(100% - 80px);
+        background-color: grey;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .admin-options button {
+        width: 100%;
+        height: 50px;
+        border: solid 1px black;
+        border-left: none;
+        border-right: none;
+        background-color: white;
+        color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .admin-options button#close {
+        color: red;
     }
 </style>
