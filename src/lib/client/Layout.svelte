@@ -144,13 +144,15 @@
             chatsList = chatsList;
 
             // Alert with information
-            const infoAlert = new Alert({
-                target: document.body,
-                props: {
-                    type: "info",
-                    message: `Case '${deletedChat[0].name}' which has been opened by you was terminated by admin`,
-                    temporaryMs: 5_000 // 5 seconds
-                }
+            setTimeout(() => {
+                const infoAlert = new Alert({
+                    target: document.body,
+                    props: {
+                        type: "info",
+                        message: `Case '${deletedChat[0].name}' which has been opened by you was terminated by admin`,
+                        temporaryMs: 5_000 // 5 seconds
+                    }
+                })
             })
         });
     })

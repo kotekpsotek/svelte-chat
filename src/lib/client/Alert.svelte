@@ -63,6 +63,7 @@
         background-color: white;
         border: solid 1px black;
         column-gap: 5px;
+        z-index: 100;
     }
 
     .ico {

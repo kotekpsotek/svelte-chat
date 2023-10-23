@@ -120,7 +120,7 @@
             </div>
         {/if}
     {/if}
-    <div class="write-message" class:admin-mode={true}>
+    <div class="write-message" class:admin-mode={adminMode}>
         {#if adminMode}
             <button class="admin-opt" on:click={onOpenCloseAdminOptions}>
                 <IbmCloudHyperProtectCryptoServices size={24} fill="white"/>
