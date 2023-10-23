@@ -6,6 +6,7 @@
     import ChatPrompt from "./ChatPrompt.svelte";
     import ChatComp from "$lib/client/Chat.svelte"
     import Alert from "./Alert.svelte"
+    import setIdCookie from "./lib.js";
 
     let chatStateShow = false;
     let conversationShowState = false;
@@ -103,7 +104,9 @@
     }
 
     onMount(() => {
-        $connection = io("http://localhost:10501");
+        $connection = io("http://localhost:10501", {
+            withCredentials: true
+        });
         const getId = (() => {
             let uId = localStorage.getItem("weeeeee-chatttt-id");
 
@@ -111,6 +114,7 @@
                 // Id doesn't exists
                 $connection!.emit("generate-my-id", (id: string) => {
                     myId = id;
+                    uId = myId
                     localStorage.setItem("weeeeee-chatttt-id", id);
                 });
             } 
@@ -122,13 +126,18 @@
             return uId;
         })();
 
+        // Set user id in cookie
+        setIdCookie(myId);
+
         // Get user chats list
         downloadChats();
 
         // Durning window size change
         window.addEventListener("resize", () => {
-            // Change size for <section class="chat"> element
-            spawnChatSection(document.querySelector('section.chat')!)
+            if (chatStateShow) {
+                // Change size for <section class="chat"> element
+                spawnChatSection(document.querySelector('section.chat')!)
+            }
         });
 
         // Capture admin terminate user chat

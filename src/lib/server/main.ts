@@ -11,6 +11,7 @@ process.env["ORIGIN"] = "http://localhost:10502";
 
 // Databases
 import * as mongodb from "./databases/mogodb.js";
+import type { Socket } from "socket.io-client";
 
 // Code main
 function makeServer() {
@@ -22,26 +23,30 @@ function makeServer() {
         }
     });
 
-    /** @description Check admin is admin for **admin actions** */
-    socket_server.use(async (socket, nxt) => {
-        // Parse cookie
-        function parseCookie() {
-            const ready = new Map<string, string>();
+    // Parse cookie
+    function parseCookie(socket: any) {
+        const ready = new Map<string, string>();
 
-            if (socket.request.headers.cookie) {
-                const differentCookies = socket.request.headers.cookie.split(";");
-                for (const cookie of differentCookies) {
-                    const [name, val] = cookie.split("=");
-                    ready.set(name, val);
-                }
+        if (socket.request.headers.cookie) {
+            const differentCookies = socket.request.headers.cookie.split(";");
+            for (const cookie of differentCookies) {
+                const [name, val] = cookie.split("=");
+                ready.set(name.trim(), val);
             }
-
-            return ready;
         }
 
+        return ready;
+    }
+
+    /** @description Check admin is admin for **admin actions** and setup user IDENTIFIER */
+    socket_server.use(async (socket, nxt) => {
         // Cookies
-        const cookies = parseCookie();
+        const cookies = parseCookie(socket);
         const sessCookie = cookies.get("sess");
+
+        // Set user id
+        socket.data.uuid = cookies.get("user_id");
+        socket.join(socket.data.uuid);
 
         // Check user admin is realy admin
         if (sessCookie) {
@@ -50,21 +55,20 @@ function makeServer() {
             if (sesCookie) {
                 socket.data.isRealAdmin = true;
                 socket.data.admin_email = sesCookie.email;
+
+                // Join admin to admin room
+                if (socket.data.isRealAdmin) {
+                    socket.join("admin-room");
+                }
             }
         }
 
         nxt();
-    })
+    });
     
     socket_server.on("connect", (socket) => {
         const conditionInteractionWithChat = (chatId: string, userId: string) => {
             return { $and: [{ id: { $eq: chatId } }, { $or: [{ user_creator: { $eq: userId } }, { "messages.user_id": { $eq: userId } }]}] }
-        };
-
-        // Join admin to admin room
-        if (socket.data.isRealAdmin) {
-            socket.join("admin-room");
-            console.log("New admin arrived")
         }
         
         socket.on("generate-my-id", (cb) => {

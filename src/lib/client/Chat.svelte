@@ -92,7 +92,7 @@
     <button class="go-back" on:click={_ => dsp("hide-chat-messages")}>
         <Return size={24} fill="black"/>
     </button>
-    <h1>Chat conversation ({chat.name.length ? chat.name : "No Name"})</h1>
+    <h1>Chat conversation ({chat.name?.length ? chat.name : "No Name"})</h1>
     <button id="close-chat" on:click={_ => dsp("close-chat")}>
         <Close size={32} fill="white"/>
     </button>

@@ -7,6 +7,7 @@
     import type { Chat as ChatType } from "../../../../../../types";
     import AlertSvelte from "../../../../../../lib/client/Alert.svelte"
     import Alert from "../../../../../../lib/client/Alert.svelte";
+    import setIdCookie from "../../../../../../lib/client/lib";
     
     let connection: Socket;
     let chats: ChatType[] = [];
@@ -95,7 +96,12 @@
             if (!email) {
                 alert("you probably isn't logged in")
             } 
-            else adminEmail = email;
+            else {
+                adminEmail = email;
+
+                // Set admin uuid
+                setIdCookie(adminEmail);
+            };
         });
 
         connection.on("admin-new-chat-arrived", (chat: ChatType) => {
