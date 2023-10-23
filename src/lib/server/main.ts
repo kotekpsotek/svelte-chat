@@ -111,7 +111,8 @@ function makeServer() {
 
         socket.on("join-to-chat", async (chatId: string, userId: string) => {
             if (socket.data.isRealAdmin || await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before join hsi present to this chat room" })) {
-                socket.join(chatId);
+                socket.join(chatId); // Join to chat id
+                socket.join(userId); // Gather in user creator room
             }
         });
 
@@ -191,6 +192,12 @@ function makeServer() {
                     socket
                         .in(chatId)
                         .emit("chat-terminated-by-admin", chatId)
+
+                    // Emit to other socket that chat has been terminated when user is not in room
+                    const otherSocketId = chatDeleted.user_creator;
+                    socket
+                        .in(otherSocketId)
+                        .emit("chat-deleted-by-admin-when-you-out-of-room", chatId)
                 }
                 else cb(false)
             }

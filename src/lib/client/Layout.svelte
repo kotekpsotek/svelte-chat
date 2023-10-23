@@ -103,6 +103,15 @@
         chat = Object.create(null);
     }
 
+    /** @description Delete chat */
+    function deleteChat(chat_id: string) {
+        const terminatedChatId = chatsList.findIndex(v => v.id == chat_id);
+        const deletedChat = chatsList.splice(terminatedChatId, 1);
+        chatsList = chatsList;
+
+        return deletedChat;
+    }
+
     onMount(() => {
         $connection = io("http://localhost:10501", {
             withCredentials: true
@@ -148,20 +157,33 @@
             }
 
             // Delete chat
-            const terminatedChatId = chatsList.findIndex(v => v.id == chat_id);
-            const deletedChat = chatsList.splice(terminatedChatId, 1);
-            chatsList = chatsList;
+            const del = deleteChat(chat_id)
 
             // Alert with information
             setTimeout(() => {
-                const infoAlert = new Alert({
+                new Alert({
                     target: document.body,
                     props: {
                         type: "info",
-                        message: `Case '${deletedChat[0].name}' which has been opened by you was terminated by admin`,
+                        message: `Case '${del[0].name}' which has been opened by you was terminated by admin`,
                         temporaryMs: 5_000 // 5 seconds
                     }
                 })
+            })
+        });
+
+        $connection?.on("chat-deleted-by-admin-when-you-out-of-room", (chat_id: string) => {
+            // Delete chat
+            const del = deleteChat(chat_id);
+
+            // Alert
+            const infoAlert = new Alert({
+                target: document.body,
+                props: {
+                    type: "info",
+                    message: `Case '${del[0].name}' which has been opened by you was terminated by admin when you are out of`,
+                    temporaryMs: 5_000 // 5 seconds
+                }
             })
         });
     })
