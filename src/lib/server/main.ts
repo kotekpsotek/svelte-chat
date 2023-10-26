@@ -143,6 +143,12 @@ function makeServer() {
                     socket.in(chatId)
                         .emit("capture-new-message", new_message);
 
+                    // Send message to message creator when admin respond
+                    if (socket.data.isRealAdmin) {
+                        socket.in(updated!.user_creator)
+                            .emit("admin-sent-response", chatId);
+                    }
+
                     // Send to client success result
                     cb(true, new_message)
                 }

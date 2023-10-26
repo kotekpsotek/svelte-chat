@@ -12,7 +12,7 @@
     let conversationShowState = false;
 
     let myId = "1"
-    let chatsList: Record<string, any>[] = []
+    let chatsList: (Record<string, any> & { new_messages?: number })[] = []
     let chat: Chat = {
         id: "",
         name: "",
@@ -187,6 +187,13 @@
                 }
             })
         });
+
+        // Set that admin send new answer
+        $connection?.on("admin-sent-response", (chat_id: string) => {
+            const chatIdF = chatsList.findIndex(v => v.id == chat_id);
+            chatsList[chatIdF].new_messages ? chatsList[chatIdF].new_messages! += 1 : chatsList[chatIdF].new_messages = 1;
+            chatsList = chatsList
+        });
     })
 </script>
 
@@ -211,6 +218,13 @@
                         <button class="entity" on:click={showOrHideChatMessages(chat.id)}>
                             <ChatLaunch size={24}/>
                             <p class="n">{chat.name || new Date(chat.creation_date).toISOString()}</p>
+                            {#if chat.new_messages}
+                                <div class="new-response">
+                                    <section>
+                                        <p>{chat.new_messages}</p>
+                                    </section>
+                                </div>
+                            {/if}
                         </button>
                     {/each}
                 {:else}
@@ -311,6 +325,7 @@
         gap: 10px;
         transition: all linear 50ms;
         cursor: pointer;
+        position: relative;
     }
 
     .chats-list button.entity:hover {
@@ -366,5 +381,27 @@
         width: 100%;
         height: calc(100% - 55px);
         /* padding: 5px; */
+    }
+
+    button.entity .new-response {
+        height: 100%;
+        width: 45px;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .new-response section {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: black;
+        color: white;
+        border-radius: 50%;
     }
 </style>
