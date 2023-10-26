@@ -107,10 +107,15 @@
         {#if chat.messages.length}
             <div class="messages-markup">
                 {#each chat.messages as message}
-                    <div class="c" class:my={message.user_id == userId}>
+                    <div class="c" class:my={(adminMode && message.user_id.includes("@")) || message.user_id == userId}>
                         <div>
                             <p>{message.content}</p>
                         </div>
+                        {#if adminMode && (message.user_id != userId && message.user_id.includes("@"))}
+                            <section class="other-admin-info">
+                                <p>Sent by <span>{message.user_id}</span></p>
+                            </section>
+                        {/if}
                     </div>
                 {/each}
             </div>
@@ -151,11 +156,12 @@
     main.messages div.c {
         width: 100%;
         display: flex;
-        justify-content: flex-start;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     main.messages div.c.my {
-        justify-content: flex-end;
+        align-items: flex-end;
     }
 
     main.messages div.c div {
@@ -340,5 +346,16 @@
 
     .admin-options button#close {
         color: red;
+    }
+
+    section.other-admin-info {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        font-size: 12px;
+        color: gray;
+    }
+
+    section.other-admin-info span {
+        font-weight: 600;
     }
 </style>
