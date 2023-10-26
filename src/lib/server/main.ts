@@ -128,7 +128,7 @@ function makeServer() {
                         } 
                     } 
                 },
-                { $project: { _id: false } }
+                { $project: { _id: false, activities: false } }
             ]);
             cb(chats);
         });

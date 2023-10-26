@@ -11,18 +11,27 @@
     let chatStateShow = false;
     let conversationShowState = false;
 
+    interface Chat {
+        id: string,
+        name: string,
+        messages: { [i: string]: any }[],
+        creation_date: Date,
+        new_messages: number
+    }
+
     let myId = "1"
-    let chatsList: (Record<string, any> & { new_messages?: number })[] = []
+    let chatsList: Chat[] = []
     let chat: Chat = {
         id: "",
         name: "",
         messages: [],
-        creation_date: new Date()
+        creation_date: new Date(),
+        new_messages: 0
     }
 
     /** Download chats list from socket.io server */
     const downloadChats = () => {
-        $connection?.emit("get-chats", myId, (chats: Record<string, any>[]) => {
+        $connection?.emit("get-chats", myId, (chats: Chat[]) => {
             chatsList = chats;
         })
     };
@@ -98,6 +107,11 @@
 
     /** Ability to close chat are supply by this function */
     function closeChat() {
+        // Update activity viewed state
+        const indexChatInList = chatsList.findIndex(v => v.id == chat.id);
+        chatsList[indexChatInList].new_messages = 0;
+        
+        // Close chat
         chatStateShow = false;
         conversationShowState = false;
         chat = Object.create(null);
