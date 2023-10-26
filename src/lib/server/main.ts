@@ -104,9 +104,33 @@ function makeServer() {
         });
 
         socket.on("get-chats", async (userId: string, cb) => {
-            const chats = await mongodb.model.find({ user_creator: { $eq: userId } })
+            /* const chats = await mongodb.model.find({ user_creator: { $eq: userId } })
                 .sort({ creation_date: "desc" });
-            cb(chats)
+            cb(chats) */
+            const chats = await mongodb.model.aggregate([
+                { $match: { user_creator: { $eq: userId } } },
+                { $sort: { creation_date: -1 } },
+                { 
+                    $set: { 
+                        new_messages: {
+                            $size: {
+                                $filter: {
+                                    input: "$messages",
+                                    as: "message",
+                                    cond: {
+                                        $and: [
+                                            { $ne: ["$$message.user_id", userId] },
+                                            { $gt: ["$$message.date", "$$ROOT.activities.user_creator"] }
+                                        ]
+                                    }
+                                }
+                            }
+                        } 
+                    } 
+                },
+                { $project: { _id: false } }
+            ]);
+            cb(chats);
         });
 
         socket.on("join-to-chat", async (chatId: string, userId: string) => {
@@ -116,9 +140,18 @@ function makeServer() {
             }
         });
 
-        socket.on("leave-chat", (chatId: string) => {
+        socket.on("leave-chat", async (chatId: string) => {
             if (socket.rooms.has(chatId)) {
+                // Leave room
                 socket.leave(chatId);
+
+                // Update last user activity
+                if (!socket.data.isRealAdmin) {
+                    await mongodb.model.findOneAndUpdate(
+                        { id: chatId }, 
+                        { activities: { user_creator: new Date() } }
+                    );
+                }
             }
         });
 

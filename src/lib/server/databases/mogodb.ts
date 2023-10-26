@@ -11,7 +11,10 @@ interface ChatSchema {
         date: Date // Date can be also uuid
     }[],
     creation_date: Date,
-    user_creator: string
+    user_creator: string,
+    activities: {
+        user_creator: Date
+    }
 }
 
 const chatSchema = new Schema<ChatSchema>({
@@ -24,7 +27,8 @@ const chatSchema = new Schema<ChatSchema>({
             return Date.now();
         }
     },
-    user_creator: { type: String, required: true }
+    user_creator: { type: String, required: true },
+    activities: { type: Object, required: false }
 });
 
 interface AdminSchema {
