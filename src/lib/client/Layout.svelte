@@ -172,6 +172,7 @@
             })
         });
 
+        // When admin delete chat which this user made
         $connection?.on("chat-deleted-by-admin-when-you-out-of-room", (chat_id: string) => {
             // Delete chat
             const del = deleteChat(chat_id);

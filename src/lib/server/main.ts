@@ -191,13 +191,18 @@ function makeServer() {
                     // Emit to other user which made terminated case
                     socket
                         .in(chatId)
-                        .emit("chat-terminated-by-admin", chatId)
+                        .emit("chat-terminated-by-admin", chatId);
 
                     // Emit to other socket that chat has been terminated when user is not in room
                     const otherSocketId = chatDeleted.user_creator;
                     socket
                         .in(otherSocketId)
                         .emit("chat-deleted-by-admin-when-you-out-of-room", chatId)
+
+                    // Emit to other admins whose aren't in deleted room that room has been deleted
+                    socket
+                        .in("admin-room")
+                        .emit("other-admin-terminate-room", chatId, socket.data.admin_email);
                 }
                 else cb(false)
             }

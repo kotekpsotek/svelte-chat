@@ -62,6 +62,17 @@
         });
     }
 
+    /** Delete chat from list  */
+    function deleteChat(chat_id: string) {
+        const terminatedChatId = chats.findIndex(v => v.id == chat_id);
+
+        if (terminatedChatId >= 0) {
+            const deletedChat = chats.splice(terminatedChatId, 1);
+            chats = chats;
+            return deletedChat;
+        }
+    } 
+
     onMount(() => {
         connection = io("http://localhost:10501", {
             withCredentials: true
@@ -120,27 +131,49 @@
             chats = [chat, ...chats];
         });
 
-        // Capture admin terminate user chat
+        // (Only when terminated chat is open) Capture this admin user terminate user chat
         connection?.on("chat-terminated-by-admin", (chat_id: string) => {
             // Close chat, only while user is in
-            if (chatG.id == chat_id) {
-                chatOpened = false;    
-            }
+            onCloseChat();
 
-            // Delete chat
-            const terminatedChatId = chats.findIndex(v => v.id == chat_id);
-            const deletedChat = chats.splice(terminatedChatId, 1);
-            chats = chats;
-
-            // Alert with information
-            const infoAlert = new Alert({
-                target: document.body,
-                props: {
-                    type: "info",
-                    message: `Case '${deletedChat[0].name}' which has been opened by you was terminated by other admin`,
-                    temporaryMs: 5_000 // 5 seconds
-                }
+            setTimeout(() => {
+                // Delete chat
+                const deletedChat = deleteChat(chat_id);
+    
+                // Alert with information
+                const infoAlert = new Alert({
+                    target: document.body,
+                    props: {
+                        type: "info",
+                        message: `Case '${deletedChat![0].name}' which has been opened by you was terminated by other admin`,
+                        temporaryMs: 5_000 // 5 seconds
+                    }
+                })
             })
+        });
+
+        // Capture chat was closed by other admin user
+        connection?.on("other-admin-terminate-room", (chatId: string, email: string) => {
+            // Only in circuminstances: terminating user is not this user and chat id is not equal to current id
+            if (adminEmail != email) {
+                // Close chat when was terminated current
+                onCloseChat();
+
+                setTimeout(() => {
+                    // Delete chat from list
+                    const deletedChat = deleteChat(chatId);
+    
+                    // Display alert
+                    const infoAlert = new Alert({
+                        target: document.body,
+                        props: {
+                            type: "info",
+                            message: `Case '${deletedChat![0].name}' has been terminated by other admin '${email}'`,
+                            temporaryMs: 5_000 // 5 seconds
+                        }
+                    });
+                });
+            }
         });
         
         setTimeout(goToChat, 1_000)
