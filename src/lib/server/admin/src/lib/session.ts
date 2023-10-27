@@ -83,4 +83,20 @@ export class SessionRead {
             expiration_date: { $gt: new Date() }
         }) != null;
     }
+
+    /** Logout user */
+    static async logout(cookies: Cookies): Promise<boolean> {
+        const sessionCookieId = SessionRead.getSessionId(cookies);
+
+        // When login
+        if (sessionCookieId && await SessionRead.alreadyLoggedin(sessionCookieId)) {
+            const sessDeleted = mongodb.sessionAdminCookiesModel.findOneAndDelete({
+                sess_id: sessionCookieId
+            });
+            return true
+        }
+
+        // Default
+        return false;
+    }
 }
