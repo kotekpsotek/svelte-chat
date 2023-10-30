@@ -30,7 +30,12 @@ export default defineConfig({
 </slot>
 <SvelteChatButton/>
 ```
-***3rd:*** You're behind finish line. Let's take fun from usage, in all scenarios
+***3rd:*** You're behind finish line. Let's take fun from usage, in all scenarios.
+
+## Other worth informations
+1. Default Admin App port is 10052,
+2. Server side work as a vite plugin,
+3. Default database is MongoDB and you should have it on your local machine port 27017 
 
 ## License
 All what you should know about Copyrights is that all code base is under <u>GPLv3</u>
