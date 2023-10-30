@@ -1,58 +1,36 @@
-# create-svelte
+# Svelte-Chat
+The complex chat solution for modern applications
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## Swift description
+Designed for Svelte applications chat which offers your clients top-level chat experiences and full power to administrate for your management team
 
-Read more about creating a library [in the docs](https://kit.svelte.dev/docs/packaging).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
+## Installation (as always - for npm)
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+$ npm i svelte-chat
 ```
 
-## Developing
+## Two Usage Step Sides - is really straight forward
+***1st:*** Use **svelteChatPlugin** which also embedds administration functionalities
+```typescript
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+import { svelteChatPlugin } from "./src/lib/server/main.js"
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+export default defineConfig({
+	plugins: [sveltekit(), svelteChatPlugin]
+});
 ```
+***2nd:*** Attach client interaction button to your SvelteKit App. Like below or similary:
+```svelte
+// Route: /src/routes/+layout.svelte
+<script>
+    import { SvelteChatButton } from "svelte-chat";
+</script>
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
-
-## Building
-
-To build your library:
-
-```bash
-npm run package
+</slot>
+<SvelteChatButton/>
 ```
+***3rd:*** You're behind finish line. Let's take fun from usage, in all scenarios
 
-To create a production version of your showcase app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
-```
+## License
+All what you should know about Copyrights is that all code base is under <u>GPLv3</u>
