@@ -35,7 +35,10 @@ export default defineConfig({
 ## Other worth informations
 1. Default Admin App port is 10052,
 2. Server side work as a vite plugin,
-3. Default database is MongoDB and you should have it on your local machine port 27017 
+3. Default database is MongoDB and you should have it on your local machine port 27017
+
+## Contribution:
+**You feel will to help in solution evolution.** Don't be shy and pull issue with demand like: I would like take the participation in evolution because ...[cause]
 
 ## License
 All what you should know about Copyrights is that all code base is under <u>GPLv3</u>
