@@ -3,7 +3,7 @@
     import type { PageData } from "./$types";
     import { goto } from "$app/navigation";
     import cookie from "js-cookie";
-    import Alert from "../../../../../client/Alert.svelte";
+    import Alert from "../../../../../../client/Alert.svelte";
 
     export let data: PageData;
     let celebrateUrl = "https://www.youtube.com/watch?v=4L_yCwFD6Jo";
