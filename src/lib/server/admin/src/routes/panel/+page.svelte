@@ -35,13 +35,16 @@
         }
     }
 
-    function onCloseChat() {
+    function onCloseChat(chat: ChatType) {
         chatOpened = false;
 
         // Unmark last chat as new one
         if (chatG.id == newChatId) {
             newChatId = undefined;
         }
+        
+        // Emit leave chat event
+        connection.emit("leave-chat", chatG.id);
     }
 
     /** Remove chat deleted by admin from list */

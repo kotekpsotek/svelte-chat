@@ -137,11 +137,32 @@ function makeServer() {
             if (socket.data.isRealAdmin || await mongodb.model.exists({ ...conditionInteractionWithChat(chatId, userId), $comment: "Check whether user is in chat (specified by chat ID) before join hsi present to this chat room" })) {
                 socket.join(chatId); // Join to chat id
                 socket.join(userId); // Gather in user creator room
+
+                // When user is in room that to other admins emit that new admin look on their hands 👁️
+                if (socket.data.isRealAdmin) {
+                    // to others
+                    socket
+                        .in(chatId)
+                        .emit("other-admin-in-room", "APPEAR", socket.data.admin_email);
+                }
             }
+        });
+
+        socket.on("admin-iam-also-in-room", (chatId: string, adminEmail: string) => {
+            socket
+                .in(chatId)
+                .emit("other-admin-in-room", "APPEAR", adminEmail);
         });
 
         socket.on("leave-chat", async (chatId: string) => {
             if (socket.rooms.has(chatId)) {
+                // When user is admin and in room that emit to other admins about he just stop looking on their hands 👁️🕶️
+                if (socket.data.isRealAdmin) {
+                    socket
+                        .in(chatId)
+                        .emit("other-admin-in-room", "HIDE", socket.data.admin_email);
+                }
+                
                 // Leave room
                 socket.leave(chatId);
 
@@ -202,14 +223,6 @@ function makeServer() {
                 cb(true, chatsFind);
             }
             else cb(false, [])
-        });
-
-        socket.on("admin-join-to-chat", (chat_id: string, cb: (success: boolean) => void) => {
-            if (socket.data.isRealAdmin) {
-                socket.join(chat_id);
-                cb(true);
-            }
-            else cb(false);
         });
 
         socket.on("admin-get-email", (cb: (email: string | undefined) => void) => {

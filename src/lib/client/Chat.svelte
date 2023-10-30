@@ -63,6 +63,15 @@
         })
     }
 
+    interface OtherAdminsCao {
+        are: boolean,
+        areEmails: string[]
+    }
+    const otherAdminsInRoomCao: OtherAdminsCao = {
+        are: false,
+        areEmails: []
+    }
+
     onMount(() => {
         const messagesContainer = document.getElementsByClassName("messages-markup")[0];
 
@@ -84,6 +93,38 @@
                 }
             })
         });
+
+        // Content only for admins
+        if (adminMode) {
+            // Capture other admin appear in room
+            connection?.on("other-admin-in-room", (event: "APPEAR" | "HIDE", adminEmail: string) => {
+                if (adminEmail != userId) {
+                    switch (event) {
+                        case "APPEAR":
+                            if (!otherAdminsInRoomCao.areEmails.includes(adminEmail)) {
+                                if (!otherAdminsInRoomCao.are) {
+                                    otherAdminsInRoomCao.are = true;
+                                }
+                                otherAdminsInRoomCao.areEmails.push(adminEmail);
+    
+                                // Send to event emitter socket that this admin is also in room TODO: such can be admin email overlay volatile
+                                connection?.emit("admin-iam-also-in-room", chat.id, userId);
+                            }
+                        break;
+        
+                        case "HIDE":
+                            const offset = otherAdminsInRoomCao.areEmails.findIndex(v => v == adminEmail);
+                            if (offset >= 0) {
+                                otherAdminsInRoomCao.areEmails.splice(offset, 1);
+                            }
+                            if (!otherAdminsInRoomCao.areEmails.length) {
+                                otherAdminsInRoomCao.are = false;
+                            }
+                        break
+                    }
+                };
+            });
+        }
     })
 </script>
 
@@ -97,6 +138,16 @@
         <Close size={32} fill="white"/>
     </button>
 </div>
+{#if adminMode && otherAdminsInRoomCao.are}
+    <div class="other-admin-is-also-in-room" title="Hyyyyee. You can see here other admins present">
+        <div id="list">
+            {#each otherAdminsInRoomCao.areEmails as oa}
+                <p>{oa}</p>
+            {/each}
+        </div>
+        <p>are looking on your hands 👁️</p>
+    </div>
+{/if}
 <main class="messages">
     {#if adminOptionsHasBeenOpened}
         <div class="admin-options">
@@ -357,5 +408,37 @@
 
     section.other-admin-info span {
         font-weight: 600;
+    }
+
+    .other-admin-is-also-in-room {
+        width: 100vw;
+        height: 50px;
+        padding-left: 5px;
+        padding-right: 5px;
+        background-color: black;
+        color: white;
+        display: flex;
+        align-items: center;
+        column-gap: 4px;
+    }
+
+    .other-admin-is-also-in-room > #list {
+        display: flex;
+        align-items: center;
+        row-gap: 2px;
+        max-width: 50%;
+        overflow-x: hidden;
+    }
+
+    #list > p {
+        color: rgb(174, 174, 174);
+    }
+
+    #list > p::after {
+        content: ",";
+    }
+
+    #list > p:last-of-type::after {
+        content: none;
     }
 </style>
