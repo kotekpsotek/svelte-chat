@@ -7,5 +7,7 @@ export const load = ({ url, cookies }) => {
         throw redirect(301, "/account/signin?not_logged");
     }
 
-    return {}
+    return {
+        server_port: process.env["SERVER_PORT"] || 10501
+    }
 }

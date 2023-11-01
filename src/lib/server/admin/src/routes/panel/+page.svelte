@@ -8,7 +8,11 @@
     import AlertSvelte from "../../../../../../lib/client/Alert.svelte"
     import Alert from "../../../../../../lib/client/Alert.svelte";
     import setIdCookie from "../../../../../../lib/client/lib";
+    import type { LayoutData } from "../$types";
     
+    // Page values from loading stuff
+    export let data: LayoutData;
+
     let connection: Socket;
     let chats: ChatType[] = [];
 
@@ -35,7 +39,7 @@
         }
     }
 
-    function onCloseChat(chat: ChatType) {
+    function onCloseChat() {
         chatOpened = false;
 
         // Unmark last chat as new one
@@ -77,7 +81,7 @@
     } 
 
     onMount(() => {
-        connection = io("http://localhost:10501", {
+        connection = io(`http://localhost:${data.server_port}`, {
             withCredentials: true
         });
 

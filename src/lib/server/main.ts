@@ -1,13 +1,11 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { randomUUID } from "crypto";
-import type { PluginOption, ViteDevServer } from "vite";
-import type { ChatPluginConfig } from "./as-plugin.js";
 import express from "express";
+import type { ChatPluginConfig } from "./as-plugin.js";
 
 // Setup SvelteKit Admin app Handler for production
-process.env["ORIGIN"] = "http://localhost:10502";
-// import { handler as svelteKitAdminApp } from "./admin/build/handler.js";
+import { handler as svelteKitAdminApp } from "./admin/build/handler.js";
 
 // Databases
 import * as mongodb from "./databases/mogodb.js";
@@ -16,7 +14,7 @@ import * as mongodb from "./databases/mogodb.js";
  * @description Handle all types of tasks for each app functionality assigned for various permission user classes: common user and admins via WebSockets socket.io library
  * @param commonServer - optional option with configuration for server
 */
-export function makeServer(commonServer: ChatPluginConfig["server"] = { port: 10501 }) {
+export function makeServer(commonServer: ChatPluginConfig["server"]) {
     const http_server = createServer();
     const socket_server = new Server(http_server, {
         cors: {
@@ -265,7 +263,7 @@ export function makeServer(commonServer: ChatPluginConfig["server"] = { port: 10
     })
     
     // Start http server what also results in start WebSocket server due to earlier steps
-    http_server.listen(commonServer.port)
+    http_server.listen(commonServer?.port)
 }
 
 /**
@@ -274,12 +272,12 @@ export function makeServer(commonServer: ChatPluginConfig["server"] = { port: 10
  * @summary To Run SvelteKit Admin app you should put environment required variables (full list below) before run command so like this: ORIGIN="SvelteKitAdminAppRoute e.g: http://localhost:10502" npm run dev. In Windows this is only possible throught WSL or any Bash shell 
  * @variation Required Environment variables: ORIGIN="Origin where your SvelteKit admin app occurs"
 */
-export function makeAdminPanelRouting(adminServer: ChatPluginConfig["admin_server"] = { port: 10502 }) {
+export function makeAdminPanelRouting(adminServer: ChatPluginConfig) {
     const app = express();
 
     // Let sveltekit application work
-    // app.use(svelteKitAdminApp);
+    app.use(svelteKitAdminApp);
 
     // Listen addmin app on specified port
-    app.listen(adminServer.port);
+    app.listen(adminServer.admin_server?.port);
 }

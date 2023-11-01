@@ -17,12 +17,12 @@ export interface ChatPluginConfig {
  * @description Direct way to attach svelte-chat plugin for your application 
  * @param config - configuration for all app dimensions
 */
-export function chatPlugin(config?: ChatPluginConfig, verbose: boolean = false) {
+export function chatPlugin(config: ChatPluginConfig = { server: { port: 10501 }, admin_server: { port: 10502 } }, verbose: boolean = false) {
     return {
         name: "svelte-chat-plugin",
         configureServer(server) {
             makeServer(config?.server);
-            makeAdminPanelRouting(config?.admin_server);
+            makeAdminPanelRouting(config);
             if (verbose) console.log("Svelte-Chat plugin is on work!");
         }
     } as PluginOption

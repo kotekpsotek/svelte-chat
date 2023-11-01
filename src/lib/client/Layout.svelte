@@ -7,7 +7,14 @@
     import ChatComp from "$lib/client/Chat.svelte"
     import Alert from "./Alert.svelte"
     import setIdCookie from "./lib.js";
+    import type { ClientOptions } from "./client.typing.js";
 
+    // User variable things
+    export let lexConfig: Required<ClientOptions["server"]> = { 
+        port: 10501
+    }
+
+    // Hard coded things
     let chatStateShow = false;
     let conversationShowState = false;
 
@@ -127,8 +134,8 @@
     }
 
     onMount(() => {
-        $connection = io("http://localhost:10501", {
-            withCredentials: true
+        $connection = io(`http://localhost:${lexConfig?.port}`, {
+            withCredentials: true // Required to pass cookies which are vital in thing verification
         });
         const getId = (() => {
             let uId = localStorage.getItem("weeeeee-chatttt-id");
