@@ -1,7 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import { svelteChatPlugin } from "./src/lib/server/main.js"
+import { chatPlugin } from "./src/lib/server/as-plugin.js"
 
 export default defineConfig({
-	plugins: [sveltekit(), svelteChatPlugin]
+	plugins: [sveltekit(), chatPlugin(undefined, true)]
 });
