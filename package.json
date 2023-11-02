@@ -5,6 +5,7 @@
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
 		"preview": "vite preview",
+		"test": "vitest",
 		"package": "svelte-kit sync && svelte-package && publint",
 		"prepublishOnly": "npm run package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -49,6 +50,7 @@
 		"mongoose": "^7.6.1",
 		"npm": "^10.2.1",
 		"socket.io": "^4.7.2",
-		"socket.io-client": "^4.7.2"
+		"socket.io-client": "^4.7.2",
+		"vitest": "^0.34.6"
 	}
 }
