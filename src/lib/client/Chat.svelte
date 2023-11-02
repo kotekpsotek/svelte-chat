@@ -72,6 +72,19 @@
         areEmails: []
     }
 
+    let functionListenerNewMessage = (newMessage: typeof chat.messages[0]) => {
+        const messagesContainerS8 = document.getElementsByClassName("messages-markup")[0];
+
+        console.log("Loaded")
+        chat.messages = [...chat.messages, newMessage];
+        setTimeout(() => {
+            // Scroll down
+            if (messagesContainerS8?.scrollHeight) {
+                messagesContainerS8.scrollTop = messagesContainerS8.scrollHeight;
+            }
+        })
+    };
+
     onMount(() => {
         const messagesContainer = document.getElementsByClassName("messages-markup")[0];
 
@@ -84,15 +97,7 @@
         });
     
         // Capture new messages from other "client" in room
-        connection?.on("capture-new-message", (newMessage: typeof chat.messages[0]) => {
-            chat.messages = [...chat.messages, newMessage];
-            setTimeout(() => {
-                // Scroll down
-                if (messagesContainer?.scrollHeight) {
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }
-            })
-        });
+        connection?.on("capture-new-message", functionListenerNewMessage);
 
         // Content only for admins
         if (adminMode) {
@@ -126,15 +131,16 @@
             });
         }
     })
+
 </script>
 
 <div class="upper">
     <!-- Close chat element -->
-    <button class="go-back" on:click={_ => dsp("hide-chat-messages")}>
+    <button class="go-back" on:click={_ => { connection?.removeListener("capture-new-message", functionListenerNewMessage); dsp("hide-chat-messages") }}>
         <Return size={24} fill="black"/>
     </button>
     <h1>Chat conversation ({chat.name?.length ? chat.name : "No Name"})</h1>
-    <button id="close-chat" on:click={_ => dsp("close-chat")}>
+    <button id="close-chat" on:click={_ => { connection?.removeListener("capture-new-message", functionListenerNewMessage); dsp("close-chat") }}>
         <Close size={32} fill="white"/>
     </button>
 </div>
