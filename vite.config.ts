@@ -3,5 +3,5 @@ import { defineConfig } from 'vite';
 import { chatPlugin } from "./src/lib/server/as-plugin.js"
 
 export default defineConfig({
-	plugins: [sveltekit(), chatPlugin(undefined, true)]
+	plugins: [sveltekit(), chatPlugin(true)]
 });

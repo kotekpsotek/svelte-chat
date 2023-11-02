@@ -7,11 +7,19 @@
     import ChatComp from "$lib/client/Chat.svelte"
     import Alert from "./Alert.svelte"
     import setIdCookie from "./lib.js";
+    import { page } from "$app/stores";
     import type { ClientOptions } from "./client.typing.js";
+    import { browser } from "$app/environment";
 
     // User variable things
-    export let lexConfig: Required<ClientOptions["server"]> = { 
-        port: 10501
+    export let lexConfig: Required<ClientOptions["server"]> | undefined = undefined;
+
+    // Setup config for server in client side
+    if (browser && !lexConfig) {
+        lexConfig = {} as any;
+        lexConfig!.port = $page.data?.server?.port;
+
+        if (!lexConfig!.port) throw new Error("Port must be setted up. Setup 'SVELTE_ENV' and server side loading or setup port manually for component throught 'lexConfig' option")
     }
 
     // Hard coded things
@@ -134,7 +142,7 @@
     }
 
     onMount(() => {
-        $connection = io(`http://localhost:${lexConfig?.port}`, {
+        $connection = io(`http://localhost:${lexConfig!.port}`, {
             withCredentials: true // Required to pass cookies which are vital in thing verification
         });
         const getId = (() => {
