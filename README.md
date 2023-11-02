@@ -9,6 +9,11 @@ Designed for SvelteKit applications chat which offers your clients top-level cha
 $ npm i svelte-chat
 ```
 
+#### Overview:
+- Chat interaction on page content background
+<br/>
+<img src="./docs/svelteChatInteraction.png" alt="Svelte-Chat Imteraction element">
+
 ## **Three to use steps - is really straight forward**
 ***1st:*** Use **svelteChatPlugin** which embedds all source functionalities (with administration included)
 ```typescript
