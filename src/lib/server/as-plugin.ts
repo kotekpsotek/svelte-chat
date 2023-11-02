@@ -14,9 +14,9 @@ export interface ChatPluginConfig {
 }
 
 /** 
- * @description Read config from Desktop ENV
+ * @description Read config from Desktop ENV or when doesn't exists return undefined
 */
-export function readConfig(): ChatPluginConfig {
+export function readConfig(): ChatPluginConfig | undefined {
     const env = process.env["SVELTE_CHAT"];
 
     if (env) {
@@ -24,7 +24,7 @@ export function readConfig(): ChatPluginConfig {
             const pEnv: ChatPluginConfig = JSON.parse(env);
             
             // When required config options aren't in config
-            if (!pEnv.admin_server?.port || !pEnv.server?.port) {
+            if ((pEnv.admin_server && !pEnv.admin_server.port) || (pEnv.server && !pEnv.server.port)) {
                 const fieldState = (field: any) => {
                     return field ? "EXISTS" : "DOESN't EXISTS"
                 }
@@ -44,20 +44,22 @@ export function readConfig(): ChatPluginConfig {
             }
         }
     }
-    else throw Error("You didn't setted-up 'SVELTE_CHAT' environment variable (ENV with config). Check docs for more details");
+
+    return;
+    // else throw Error("You didn't setted-up 'SVELTE_CHAT' environment variable (ENV with config). Check docs for more details");
 }
 
 /** 
  * @description Direct way to attach svelte-chat plugin for your application 
  * @param config - configuration for all app dimensions
 */
-export function chatPlugin(config: ChatPluginConfig = { server: { port: 10501 }, admin_server: { port: 10502 } }, verbose: boolean = false) {
+export function chatPlugin(verbose: boolean = false) {
     return {
         name: "svelte-chat-plugin",
         configureServer(server) {
-            makeServer(config?.server);
-            // TODO: 'makeAdminPanelRouting' function should be executed as separate application in order to allow for pass ENV's which can be read into '@sveltejs/adapter-node' app. This can be done via "node.js" "child_process" module, e.g: child_process.spawn("ORIGIN="" node file.js") (Requirement full: file.js file should be known on desktoip )
-            // makeAdminPanelRouting(config);
+            makeServer();
+            // TODO:
+            makeAdminPanelRouting();
             if (verbose) console.log("Svelte-Chat plugin is on work!");
         }
     } as PluginOption
