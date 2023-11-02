@@ -81,7 +81,7 @@
     } 
 
     onMount(() => {
-        connection = io(`http://localhost:${data.server_port}`, {
+        connection = io(`http://localhost:${data.server.port}`, {
             withCredentials: true
         });
 

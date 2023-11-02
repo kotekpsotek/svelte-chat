@@ -1,5 +1,6 @@
 import * as session from "../lib/session";
 import { redirect } from "@sveltejs/kit";
+import { loadLayoutServer } from "../../../as-plugin"
 
 export const load = ({ url, cookies }) => {
     const sesId = session.SessionRead.getSessionId(cookies);
@@ -8,6 +9,6 @@ export const load = ({ url, cookies }) => {
     }
 
     return {
-        server_port: process.env["SERVER_PORT"] || 10501
+        ...loadLayoutServer()
     }
 }
