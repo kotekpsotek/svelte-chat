@@ -139,7 +139,13 @@
     <button class="go-back" on:click={_ => { connection?.removeListener("capture-new-message", functionListenerNewMessage); dsp("hide-chat-messages") }}>
         <Return size={24} fill="black"/>
     </button>
-    <h1>Chat conversation ({chat.name?.length ? chat.name : "No Name"})</h1>
+    <h1>
+        {#if adminOptionsHasBeenOpened}
+            <p>Chat management options</p>
+        {:else}
+            Chat conversation ({chat.name?.length ? chat.name : "No Name"})
+        {/if}
+    </h1>
     <button id="close-chat" on:click={_ => { connection?.removeListener("capture-new-message", functionListenerNewMessage); dsp("close-chat") }}>
         <Close size={32} fill="white"/>
     </button>
