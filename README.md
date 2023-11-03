@@ -26,7 +26,7 @@ $ npm i svelte-chat
         <img src="./docs/client/svelteChatBubbles.png" alt="Chat message bubles">
     </ul>
     <br>
-    <h3><b>For admins app<b></h3>
+    <h3><b>For admins app</b></h3>
     <ul>
         <li>Activiteies required to be an admin and stop</li>
         <ul>
@@ -157,3 +157,5 @@ Ok, So when we defined what you can configure, to make this work and <u>***end f
 
 ## License
 All what you should know about Copyrights is that all code base is under <u>GPLv3</u>
+
+<h3 align="center">Made with ❤️ by <b><a href="https://github.com/kotekpsotek">kotekpsotek</a></b></h3>
