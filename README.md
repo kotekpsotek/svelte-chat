@@ -2,7 +2,7 @@
 The complex chat solution for modern applications
 
 ## Swift description
-Designed for SvelteKit applications chat which offers your clients top-level chat experiences and full power to administrate for your management team
+Designed for **SvelteKit applications** chat which offers your clients top-level chat experiences and full power to administrate for your management team
 
 ## Installation (as always - for npm)
 ```bash
