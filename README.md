@@ -15,6 +15,10 @@ Designed for **SvelteKit applications** chat which offers your clients top-level
 $ npm i svelte-chat
 ```
 
+## Prerequisites
+1. SvelteKit app,
+2. MongoDB configured on port 27017
+
 ### Overview:
 <details>
     <summary>
