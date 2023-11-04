@@ -1,3 +1,9 @@
+[![License](https://img.shields.io/github/license/kotekpsotek/svelte-chat?logoColor=blue)](https://github.com/kotekpsotek/svelte-chat)
+[![Version](https://img.shields.io/npm/v/svelte-chat)](https://github.com/kotekpsotek/svelte-chat)
+[![Last Activity](https://img.shields.io/github/commit-activity/w/kotekpsotek/svelte-chat
+)](https://github.com/kotekpsotek/svelte-chat)
+![GitHub issues](https://img.shields.io/github/issues/kotekpsotek/svelte-chat)
+
 # Svelte-Chat
 The complex chat solution for modern applications
 
