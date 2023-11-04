@@ -131,7 +131,6 @@
             });
         }
     })
-
 </script>
 
 <div class="upper">

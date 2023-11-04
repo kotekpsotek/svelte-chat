@@ -10,6 +10,8 @@
     import { page } from "$app/stores";
     import type { ClientOptions } from "./client.typing.js";
     import { browser } from "$app/environment";
+    import Cookie from "js-cookie";
+    import WhenIsAdmin from "./IsAdminAndTryToBeInNormalChat.svelte"
 
     // User variable things
     export let lexConfig: Required<ClientOptions["server"]> | undefined = undefined;
@@ -141,6 +143,17 @@
         return deletedChat;
     }
 
+    /** @description Check user is login as the admin */
+    function checkIsUserAnAdmin(): boolean {
+        /** What from factors which determines user is the admin is having "sess" cookie */
+        const hasGotSess = Cookie.get("sess") ? true : false;
+        /** Also other factor which determines that user is the admin is user_id cookie with email adress */
+        const hasGotAdminUserId = Cookie.get("user_id") != undefined && Cookie.get("user_id")?.includes("@") ? true : false;
+
+        /** To determine, user is an admin both must be full-filled */
+        return hasGotSess || hasGotAdminUserId;
+    }
+
     onMount(() => {
         $connection = io(`http://localhost:${lexConfig!.port}`, {
             withCredentials: true // Required to pass cookies which are vital in thing verification
@@ -229,7 +242,7 @@
 <button class="chat-action" id="c-ico" on:click={loadChat}>
     <ChatIco size={32} fill="white"/>
 </button>
-{#if chatStateShow}
+{#if chatStateShow && !checkIsUserAnAdmin()}
     <!-- TODO: 1. List of stated prior chats by date, 2. Chat messages, 3. Ability to send new message -->
     <section class="chat" use:spawnChatSection>
         {#if !conversationShowState}
@@ -274,6 +287,9 @@
             <ChatComp userId={myId} chat={chat} connection={$connection} on:close-chat={closeChat} on:hide-chat-messages={showOrHideChatMessages(undefined)}/>
         {/if}
     </section>
+{:else if chatStateShow && checkIsUserAnAdmin()}
+    <!-- When user is the admin and try to use normal chat what will be cause normally confusion in component behaviour -->
+    <WhenIsAdmin on:terminated={_ => { window.location.reload(); /* To initialize reactivity and reload component */}}/>
 {/if}
 
 <style>
