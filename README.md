@@ -27,13 +27,13 @@ $ npm i svelte-chat
     <h3><b>For clients app</b></h3>
     <ul>
         <li>Chat interaction on page content background</li>
-        <img src="./docs/client/svelteChatInteraction.png" alt="Svelte-Chat Imteraction element">
+        <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/client/svelteChatInteraction.png" alt="Svelte-Chat Imteraction element">
         <li>Empty Chat List</li>
-        <img src="./docs/client/svelteEmptyChatList.png" alt="Empty chat list">
+        <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/client/svelteEmptyChatList.png" alt="Empty chat list">
         <li>Chat lists with some</li>
-        <img src="./docs/client/svelteChatsList.png" alt="Chat list with some chats">
+        <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/client/svelteChatsList.png" alt="Chat list with some chats">
         <li>Particular selected chat</li>
-        <img src="./docs/client/svelteChatBubbles.png" alt="Chat message bubles">
+        <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/client/svelteChatBubbles.png" alt="Chat message bubles">
     </ul>
     <br>
     <h3><b>For admins app</b></h3>
@@ -41,25 +41,25 @@ $ npm i svelte-chat
         <li>Activiteies required to be an admin and stop</li>
         <ul>
             <li>Signup</li>
-            <img src="./docs/admin/signup.png">
+            <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/admin/signup.png">
             <li>Signin</li>
-            <img src="./docs/admin/signin.png">
+            <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/admin/signin.png">
             <li>Logout</li>
-            <img src="./docs/admin/logout.png">
+            <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/admin/logout.png">
         </ul>
         <li>Admin Panel</li>
         <ul>
             <li>Empty one</li>
-            <img src="./docs/admin/adminPanelEmpty.png">
+            <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/admin/adminPanelEmpty.png">
             <li>One with open cases</li>
-            <img src="./docs/admin/adminPanel.png">
+            <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/admin/adminPanel.png">
         </ul>
         <li>Chat conversation</li>
         <ul>
             <li>Messages and task/send-bar</li>
-            <img src="./docs/admin/chatConversation.png">
+            <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/admin/chatConversation.png">
             <li>Chat Management Menu</li>
-            <img src="./docs/admin/chatManagementOptions.png">
+            <img src="https://github.com/kotekpsotek/svelte-chat/tree/main/docs/admin/chatManagementOptions.png">
         </ul>
     </ul>
 </details>
