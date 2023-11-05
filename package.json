@@ -52,5 +52,6 @@
 		"socket.io-client": "^4.7.2",
 		"vitest": "^0.34.6",
 		"@sveltejs/kit": "^1.20.4"
-	}
+	},
+	"keywords": ["sveltekit", "svelte", "solution", "admin", "management", "chat", "express", "express.js", "node", "node.js", "typescript", "database", "mongodb", "client", "user"]
 }
